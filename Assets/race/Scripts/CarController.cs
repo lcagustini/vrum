@@ -12,9 +12,13 @@ public class CarController : MonoBehaviourValidated
         public float steer;
         public float accelerate;
         public float brake;
+        public Vector2 camera;
     }
 
     [SerializeField, Self] public Rigidbody RB;
+    [SerializeField, Child] public new Camera camera;
+    private Vector3 cameraOriginalPosition;
+    private Quaternion cameraOriginalRotation;
 
     public float topSpeed;
 
@@ -24,6 +28,19 @@ public class CarController : MonoBehaviourValidated
     public AnimationCurve brakeResponseCurve;
 
     public InputData inputData;
+
+    private void Awake()
+    {
+        cameraOriginalPosition = camera.transform.localPosition;
+        cameraOriginalRotation = camera.transform.localRotation;
+    }
+
+    private void Update()
+    {
+        Quaternion rotation = Quaternion.AngleAxis(inputData.camera.x * 90, transform.up);
+        camera.transform.localPosition = rotation * cameraOriginalPosition;
+        camera.transform.localRotation = rotation * cameraOriginalRotation;
+    }
 
     public void Steer(CallbackContext context)
     {
@@ -39,20 +56,9 @@ public class CarController : MonoBehaviourValidated
     {
         inputData.brake = context.ReadValue<float>();
     }
-}
 
-[CustomEditor(typeof(CarController))]
-public class CarControllerEditor : Editor
-{
-    public override void OnInspectorGUI()
+    public void Camera(CallbackContext context)
     {
-        CarController car = (CarController)target;
-
-        base.OnInspectorGUI();
-
-        if (GUILayout.Button("Add force"))
-        {
-            car.RB.AddForce(2000 * car.transform.forward);
-        }
+        inputData.camera = context.ReadValue<Vector2>();
     }
 }
