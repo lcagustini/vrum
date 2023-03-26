@@ -1,29 +1,23 @@
 using SceneRefAttributes;
 using Unity.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Wheel : MonoBehaviourValidated
 {
     [SerializeField, Parent] private CarController car;
     [SerializeField, Child(Flag.Optional)] private ParticleSystem driftSmoke;
-
-    public bool motorWheel;
-
-    public float wheelRadius;
-    public float wheelTurnDegrees;
-    public float wheelMass;
     [SerializeField, Anywhere] public Transform wheelVisual;
 
-    public float springMaxTravel;
-    public float springRestDistance;
-    [ReadOnly] private float springLength;
-    public float springStrength;
-    public float dampingStrength;
+    [SerializeField] private WheelType wheelType;
 
-    public AnimationCurve gripFactorCurve;
+    private float springLength;
 
     public Vector3 WheelPosition => transform.position + (springLength * -transform.up);
+
+    private bool IsMotorWheel => ((wheelType == WheelType.BackLeft || wheelType == WheelType.BackRight) && (car.config.drivetrain == Drivetrain.RearWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive)) || ((wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight) && (car.config.drivetrain == Drivetrain.FrontWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive));
+    private bool IsSteeringWheel => wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight;
 
     private void ApplySuspensionForce()
     {
@@ -31,11 +25,11 @@ public class Wheel : MonoBehaviourValidated
 
         float upComponent = Vector3.Dot(transform.up, velocity);
 
-        float springForce = springStrength * (springRestDistance - springLength);
-        float dampingForce = dampingStrength * upComponent;
+        float springForce = car.config.springStrength * (car.config.springRestDistance - springLength);
+        float dampingForce = car.config.dampingStrength * upComponent;
         Vector3 forceVector = (springForce - dampingForce) * transform.up;
 
-        Debug.DrawLine(transform.position, transform.position + forceVector, Color.magenta);
+        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
@@ -43,31 +37,32 @@ public class Wheel : MonoBehaviourValidated
     {
         Vector3 velocity = car.RB.GetPointVelocity(transform.position);
         float speed = velocity.magnitude;
+        float speedRatio = speed / car.config.topSpeed;
 
         float sidewaysComponent = Vector3.Dot(transform.right, velocity);
         float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
 
-        float gripFactor = gripFactorCurve.Evaluate(sidewaysRatio);
-        float gripForce = -gripFactor * sidewaysComponent * wheelMass / Time.fixedDeltaTime;
+        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
+        float gripForce = -gripFactor * sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
         Vector3 forceVector = gripForce * transform.right;
 
-        Debug.DrawLine(transform.position, transform.position + forceVector, Color.magenta);
+        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
     private void ApplyAccelerationForce()
     {
-        if (motorWheel)
+        if (IsMotorWheel)
         {
             Vector3 velocity = car.RB.GetPointVelocity(transform.position);
 
             float forwardComponent = Vector3.Dot(transform.forward, velocity);
-            float forwardRatio = forwardComponent / car.topSpeed;
+            float forwardRatio = forwardComponent / car.config.topSpeed;
 
-            float motorTorque = car.inputData.accelerate * car.motorMaxTorque * car.motorTorqueResponseCurve.Evaluate(forwardRatio);
+            float motorTorque = car.inputData.accelerate * car.config.motorMaxTorque * car.config.motorTorqueResponseCurve.Evaluate(forwardRatio);
             Vector3 forceVector = transform.forward * motorTorque;
 
-            Debug.DrawLine(transform.position, transform.position + forceVector, Color.magenta);
+            Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
             car.RB.AddForceAtPosition(forceVector, transform.position);
         }
     }
@@ -77,54 +72,74 @@ public class Wheel : MonoBehaviourValidated
         Vector3 velocity = car.RB.GetPointVelocity(transform.position);
 
         float forwardComponent = Vector3.Dot(transform.forward, velocity);
-        float forwardRatio = Mathf.Abs(forwardComponent / car.topSpeed);
+        float forwardRatio = Mathf.Abs(forwardComponent / car.config.topSpeed);
 
-        float brakeFactor = input * car.brakeResponseCurve.Evaluate(forwardRatio);
-        float brakeForce = -brakeFactor * forwardComponent * wheelMass / Time.fixedDeltaTime;
+        float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(forwardRatio);
+        float brakeForce = -brakeFactor * forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
         Vector3 forceVector = brakeForce * transform.forward;
 
-        Debug.DrawLine(transform.position, transform.position + forceVector, Color.magenta);
+        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
     private void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, springMaxTravel + wheelRadius))
+        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius))
         {
-            springLength = hitInfo.distance - wheelRadius;
+            springLength = hitInfo.distance - car.config.wheelRadius;
 
             ApplySuspensionForce();
             ApplySteeringForce();
             ApplyAccelerationForce();
             ApplyBrakeForce(car.inputData.brake);
 
-            if (car.inputData.accelerate < 0.0001f) ApplyBrakeForce(0.01f);
+            if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f);
         }
         else
         {
-            springLength = springMaxTravel;
+            springLength = car.config.springMaxTravel;
         }
     }
 
     private void Update()
     {
-        transform.rotation = car.transform.rotation * Quaternion.AngleAxis(wheelTurnDegrees * car.inputData.steer, car.transform.up);
+        if (IsSteeringWheel)
+        {
+            transform.rotation = car.transform.rotation * Quaternion.AngleAxis((car.inputData.powerTurn ? car.config.wheelPowerTurnDegrees : car.config.wheelNormalTurnDegrees) * car.inputData.steer, car.transform.up);
+        }
 
         wheelVisual.transform.position = WheelPosition;
         wheelVisual.transform.rotation = transform.rotation;
+
+        if (car.inputData.powerTurn && !driftSmoke.isPlaying) driftSmoke.Play();
+        if (!car.inputData.powerTurn && driftSmoke.isPlaying) driftSmoke.Stop();
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
         if (Application.isPlaying) Gizmos.DrawLine(transform.position, WheelPosition);
-        else Gizmos.DrawLine(transform.position, transform.position + (springRestDistance * -transform.up));
+        else Gizmos.DrawLine(transform.position, transform.position + (car.config.springRestDistance * -transform.up));
 
-        Gizmos.color = Color.black;
-        if (Application.isPlaying) Gizmos.DrawWireSphere(WheelPosition, wheelRadius);
-        else Gizmos.DrawWireSphere(transform.position + (springRestDistance * -transform.up), wheelRadius);
+        {
+            Vector3 velocity = car.RB.GetPointVelocity(transform.position);
+            float speed = velocity.magnitude;
+            float speedRatio = speed / car.config.topSpeed;
+
+            float sidewaysComponent = Vector3.Dot(transform.right, velocity);
+            float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
+
+            float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
+
+            Gizmos.color = Color.Lerp(Color.red, Color.green, gripFactor);
+        }
+
+        if (Application.isPlaying) Gizmos.DrawSphere(WheelPosition, car.config.wheelRadius);
+        else Gizmos.DrawSphere(transform.position + (car.config.springRestDistance * -transform.up), car.config.wheelRadius);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, transform.position + (springRestDistance * -transform.up));
+        Gizmos.DrawLine(transform.position, transform.position + (car.config.springRestDistance * -transform.up));
     }
+#endif
 }

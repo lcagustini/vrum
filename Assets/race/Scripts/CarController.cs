@@ -13,33 +13,33 @@ public class CarController : MonoBehaviourValidated
         public float accelerate;
         public float brake;
         public Vector2 camera;
+
+        public bool powerTurn;
     }
 
     [SerializeField, Self] public Rigidbody RB;
-    [SerializeField, Child] public new Camera camera;
-    private Vector3 cameraOriginalPosition;
-    private Quaternion cameraOriginalRotation;
 
-    public float topSpeed;
-
-    public AnimationCurve motorTorqueResponseCurve;
-    public float motorMaxTorque;
-
-    public AnimationCurve brakeResponseCurve;
+    public CarConfig config;
 
     public InputData inputData;
 
-    private void Awake()
+    private void Start()
     {
-        cameraOriginalPosition = camera.transform.localPosition;
-        cameraOriginalRotation = camera.transform.localRotation;
+        LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<CheckpointCollider>() is CheckpointCollider checkpoint)
+        {
+            LapManager.Instance.UpdateCheckpoint(this, checkpoint.order);
+        }
     }
 
     private void Update()
     {
-        Quaternion rotation = Quaternion.AngleAxis(inputData.camera.x * 90, transform.up);
-        camera.transform.localPosition = rotation * cameraOriginalPosition;
-        camera.transform.localRotation = rotation * cameraOriginalRotation;
+        if (!inputData.powerTurn && inputData.accelerate > 0.5f && inputData.brake > 0.5f && Mathf.Abs(inputData.steer) > 0.5f) inputData.powerTurn = true;
+        if (inputData.powerTurn && (Mathf.Abs(inputData.steer) < 0.1f || inputData.accelerate < 0.1f)) inputData.powerTurn = false;
     }
 
     public void Steer(CallbackContext context)

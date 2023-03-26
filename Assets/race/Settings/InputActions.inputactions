@@ -40,6 +40,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Gear Up",
+                    "type": "Button",
+                    "id": "f08f1786-0e3c-41c1-a7be-bfd291885b7a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Gear Down",
+                    "type": "Button",
+                    "id": "041afdee-42c4-428e-ade2-35e8f41a7dba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -82,8 +100,30 @@
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "DefaultScheme",
                     "action": "Camera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "33918435-314a-4a36-8ec6-ff37d49dff6a",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "DefaultScheme",
+                    "action": "Gear Up",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4ef1837b-0619-46e6-83ad-24965566d2e7",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "DefaultScheme",
+                    "action": "Gear Down",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
