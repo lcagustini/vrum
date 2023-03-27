@@ -23,7 +23,7 @@ public class CarConfig : ScriptableObject
     public float topSpeed;
     public Drivetrain drivetrain;
 
-    public AnimationCurve motorTorqueResponseCurve;
+    public List<AnimationCurve> motorTorqueResponseCurve;
     public float motorMaxTorque;
 
     public AnimationCurve brakeResponseCurve;
@@ -38,6 +38,9 @@ public class CarConfig : ScriptableObject
     public float springStrength;
     public float dampingStrength;
 
+    public List<AnimationCurve> accelerationSteeringFactorCurves;
+
     public List<AnimationCurve> sidewaysGripFactorCurves;
     public List<AnimationCurve> speedGripFactorCurves;
+    public float gripMultiplier;
 }

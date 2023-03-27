@@ -19653,6 +19653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RB: {fileID: 6901182554982092200}
   config: {fileID: 11400000, guid: 4227765f88af20a46ae67c3457e0439d, type: 2}
+  automaticTransmission: 1
 --- !u!114 &2625404590673165889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19743,6 +19744,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1fad6dbc-691d-4943-a07a-d520ea281ca9
     m_ActionName: Gameplay/Camera[/XInputControllerWindows/rightStick]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6523819325130521012}
+        m_TargetAssemblyTypeName: CarController, race
+        m_MethodName: GearUp
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: f08f1786-0e3c-41c1-a7be-bfd291885b7a
+    m_ActionName: Gameplay/Gear Up[/XInputControllerWindows/rightShoulder]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6523819325130521012}
+        m_TargetAssemblyTypeName: CarController, race
+        m_MethodName: GearDown
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 041afdee-42c4-428e-ade2-35e8f41a7dba
+    m_ActionName: Gameplay/Gear Down[/XInputControllerWindows/leftShoulder]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
@@ -19895,7 +19928,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4501116452614980176}
-  - component: {fileID: 73755692824708558}
+  - component: {fileID: 1434030066014765492}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -19918,8 +19951,8 @@ Transform:
   m_Father: {fileID: 8020107471111344943}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &73755692824708558
-BoxCollider:
+--- !u!136 &1434030066014765492
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -19936,9 +19969,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2, y: 0.86, z: 2.56}
-  m_Center: {x: 0, y: 1.02, z: -0.08}
+  serializedVersion: 2
+  m_Radius: 0.8
+  m_Height: 4
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.4, z: 0}
 --- !u!1001 &2604408158315150275
 PrefabInstance:
   m_ObjectHideFlags: 0

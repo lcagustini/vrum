@@ -42,7 +42,7 @@ public class Wheel : MonoBehaviourValidated
         float sidewaysComponent = Vector3.Dot(transform.right, velocity);
         float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
 
-        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
+        float gripFactor = car.config.gripMultiplier * car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
         float gripForce = -gripFactor * sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
         Vector3 forceVector = gripForce * transform.right;
 
@@ -55,11 +55,16 @@ public class Wheel : MonoBehaviourValidated
         if (IsMotorWheel)
         {
             Vector3 velocity = car.RB.GetPointVelocity(transform.position);
+            float speed = velocity.magnitude;
 
             float forwardComponent = Vector3.Dot(transform.forward, velocity);
             float forwardRatio = forwardComponent / car.config.topSpeed;
 
-            float motorTorque = car.inputData.accelerate * car.config.motorMaxTorque * car.config.motorTorqueResponseCurve.Evaluate(forwardRatio);
+            float sidewaysComponent = Vector3.Dot(transform.right, velocity);
+            float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
+
+            float motorTorqueFactor = car.inputData.accelerate * car.config.accelerationSteeringFactorCurves[(int)wheelType].Evaluate(car.inputData.powerTurn ? 2 * sidewaysRatio : sidewaysRatio) * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(forwardRatio);
+            float motorTorque = Mathf.Clamp(motorTorqueFactor, -1.0f, 1.0f) * car.config.motorMaxTorque;
             Vector3 forceVector = transform.forward * motorTorque;
 
             Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
@@ -105,7 +110,7 @@ public class Wheel : MonoBehaviourValidated
     {
         if (IsSteeringWheel)
         {
-            transform.rotation = car.transform.rotation * Quaternion.AngleAxis((car.inputData.powerTurn ? car.config.wheelPowerTurnDegrees : car.config.wheelNormalTurnDegrees) * car.inputData.steer, car.transform.up);
+            transform.rotation = car.transform.rotation * Quaternion.AngleAxis((car.inputData.powerTurn ? car.config.wheelPowerTurnDegrees : car.config.wheelNormalTurnDegrees) * car.inputData.steer, transform.up);
         }
 
         wheelVisual.transform.position = WheelPosition;

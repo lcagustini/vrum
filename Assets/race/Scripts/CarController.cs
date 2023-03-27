@@ -15,6 +15,7 @@ public class CarController : MonoBehaviourValidated
         public Vector2 camera;
 
         public bool powerTurn;
+        public int gear;
     }
 
     [SerializeField, Self] public Rigidbody RB;
@@ -22,6 +23,8 @@ public class CarController : MonoBehaviourValidated
     public CarConfig config;
 
     public InputData inputData;
+
+    public bool automaticTransmission;
 
     private void Start()
     {
@@ -38,8 +41,40 @@ public class CarController : MonoBehaviourValidated
 
     private void Update()
     {
-        if (!inputData.powerTurn && inputData.accelerate > 0.5f && inputData.brake > 0.5f && Mathf.Abs(inputData.steer) > 0.5f) inputData.powerTurn = true;
-        if (inputData.powerTurn && (Mathf.Abs(inputData.steer) < 0.1f || inputData.accelerate < 0.1f)) inputData.powerTurn = false;
+        {
+            if (!inputData.powerTurn && inputData.accelerate > 0.5f && inputData.brake > 0.5f && Mathf.Abs(inputData.steer) > 0.5f)
+            {
+                inputData.powerTurn = true;
+                inputData.brake = 0;
+            }
+            if (inputData.powerTurn && (Mathf.Abs(inputData.steer) < 0.1f || inputData.accelerate < 0.1f))
+            {
+                inputData.powerTurn = false;
+            }
+        }
+
+        if (automaticTransmission && inputData.accelerate > 0.1f && inputData.gear > 0)
+        {
+            Vector3 velocity = RB.GetPointVelocity(transform.position);
+
+            float forwardComponent = Vector3.Dot(transform.forward, velocity);
+            float forwardRatio = forwardComponent / config.topSpeed;
+
+            float max = config.motorTorqueResponseCurve[0].Evaluate(forwardRatio);
+            int maxIndex = 0;
+
+            for (int i = 1; i < config.motorTorqueResponseCurve.Count; i++)
+            {
+                float value = config.motorTorqueResponseCurve[i].Evaluate(forwardRatio);
+                if (value > max)
+                {
+                    maxIndex = i;
+                    max = value;
+                }
+            }
+
+            inputData.gear = maxIndex;
+        }
     }
 
     public void Steer(CallbackContext context)
@@ -60,5 +95,21 @@ public class CarController : MonoBehaviourValidated
     public void Camera(CallbackContext context)
     {
         inputData.camera = context.ReadValue<Vector2>();
+    }
+
+    public void GearUp(CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (inputData.gear < config.motorTorqueResponseCurve.Count - 1) inputData.gear++;
+        }
+    }
+
+    public void GearDown(CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (inputData.gear > 0) inputData.gear--;
+        }
     }
 }
