@@ -1,6 +1,7 @@
 using SceneRefAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
@@ -25,6 +26,20 @@ public class CarController : MonoBehaviourValidated
 
     public bool automaticTransmission;
 
+    public float GetGearRatio()
+    {
+        float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
+        float forwardRatio = forwardComponent / config.topSpeed;
+        AnimationCurve gearCurve = config.motorTorqueResponseCurve[inputData.gear];
+
+        Keyframe first = gearCurve.keys.First(k => k.value >= 0);
+        Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
+
+        float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
+
+        return Mathf.Clamp01(inputData.gear == 0 ? 1 - rpmRatio : rpmRatio);
+    }
+
     private void Start()
     {
         LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
@@ -40,27 +55,11 @@ public class CarController : MonoBehaviourValidated
 
     private void Update()
     {
-        if (automaticTransmission && inputData.accelerate > 0.1f && inputData.gear > 0)
+        if (automaticTransmission && inputData.gear > 0)
         {
-            Vector3 velocity = RB.GetPointVelocity(transform.position);
-
-            float forwardComponent = Vector3.Dot(transform.forward, velocity);
-            float forwardRatio = forwardComponent / config.topSpeed;
-
-            float max = config.motorTorqueResponseCurve[0].Evaluate(forwardRatio);
-            int maxIndex = 0;
-
-            for (int i = 1; i < config.motorTorqueResponseCurve.Count; i++)
-            {
-                float value = config.motorTorqueResponseCurve[i].Evaluate(forwardRatio);
-                if (value > max)
-                {
-                    maxIndex = i;
-                    max = value;
-                }
-            }
-
-            inputData.gear = maxIndex;
+            float ratio = GetGearRatio();
+            if (inputData.gear < config.motorTorqueResponseCurve.Count - 1 && ratio > config.automaticGearLimits.y) inputData.gear++;
+            if (inputData.gear > 1 && ratio < config.automaticGearLimits.x) inputData.gear--;
         }
     }
 

@@ -23,6 +23,7 @@ public class CarConfig : ScriptableObject
     public float topSpeed;
     public Drivetrain drivetrain;
 
+    public Vector2 automaticGearLimits;
     public List<AnimationCurve> motorTorqueResponseCurve;
     public float motorMaxTorque;
 

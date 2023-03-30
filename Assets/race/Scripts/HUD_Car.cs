@@ -18,20 +18,6 @@ public class HUD_Car : MonoBehaviourValidated
 
     private CarController car;
 
-    private float GetGearRatio()
-    {
-        float forwardComponent = Vector3.Dot(car.transform.forward, car.RB.velocity);
-        float forwardRatio = forwardComponent / car.config.topSpeed;
-        AnimationCurve gearCurve = car.config.motorTorqueResponseCurve[car.inputData.gear];
-
-        Keyframe first = gearCurve.keys.First(k => k.value >= 0);
-        Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
-
-        float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
-
-        return Mathf.Clamp01(car.inputData.gear == 0 ? 1 - rpmRatio : rpmRatio);
-    }
-
     private string FormatTime(float time)
     {
         int mili = (int)((time % 1) * 100);
@@ -47,7 +33,7 @@ public class HUD_Car : MonoBehaviourValidated
 
         speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
         gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
-        gearRatio.value = GetGearRatio();
+        gearRatio.value = car.GetGearRatio();
 
         if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
         else if (gearRatio.value > 0.75f) gearRatioImage.color = Color.yellow;

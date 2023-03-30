@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   topSpeed: 90
   drivetrain: 0
+  automaticGearLimits: {x: 0.4, y: 0.9}
   motorTorqueResponseCurve:
   - serializedVersion: 2
     m_Curve:
@@ -52,23 +53,23 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0.5
-      inSlope: 1.4999998
-      outSlope: 1.4999998
+      inSlope: 1.0966799
+      outSlope: 1.0966799
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.1
-      value: 0.65
-      inSlope: -2.5
-      outSlope: -2.5
+      time: 0.13585815
+      value: 0.6489929
+      inSlope: -2.2945828
+      outSlope: -2.2945828
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.2
+      time: 0.25
       value: 0
       inSlope: -6.258317
       outSlope: -6.258317
@@ -77,8 +78,8 @@ MonoBehaviour:
       inWeight: 0.13237447
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.24871753
-      value: -0.8993796
+      time: 0.29943776
+      value: -0.90237033
       inSlope: 0
       outSlope: 0
       tangentMode: 0

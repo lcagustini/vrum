@@ -7,6 +7,23 @@ using UnityEngine.VFX;
 
 public class Wheel : MonoBehaviourValidated
 {
+    private struct WheelData
+    {
+        public Vector3 velocity;
+        public float speed;
+        public float speedRatio;
+
+        public float forwardComponent;
+        public float forwardRatio;
+
+        public float sidewaysComponent;
+        public float sidewaysRatio;
+
+        public float upComponent;
+
+        public float gripFactor;
+    }
+
     [SerializeField, Parent] private CarController car;
 
     [SerializeField, Child(Flag.Optional)] private VisualEffect driftSmoke;
@@ -19,37 +36,26 @@ public class Wheel : MonoBehaviourValidated
     [SerializeField] private float smokeThreshold;
 
     private float springLength;
+    private bool grounded;
 
     public Vector3 WheelPosition => transform.position + (springLength * -transform.up);
 
     private bool IsMotorWheel => ((wheelType == WheelType.BackLeft || wheelType == WheelType.BackRight) && (car.config.drivetrain == Drivetrain.RearWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive)) || ((wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight) && (car.config.drivetrain == Drivetrain.FrontWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive));
     private bool IsSteeringWheel => wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight;
 
-    private void ApplySuspensionForce()
+    private void ApplySuspensionForce(WheelData wheelData)
     {
-        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-
-        float upComponent = Vector3.Dot(transform.up, velocity);
-
         float springForce = car.config.springStrength * (car.config.springRestDistance - springLength);
-        float dampingForce = car.config.dampingStrength * upComponent;
+        float dampingForce = car.config.dampingStrength * wheelData.upComponent;
         Vector3 forceVector = (springForce - dampingForce) * transform.up;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
-    private void ApplySteeringForce()
+    private void ApplySteeringForce(WheelData wheelData)
     {
-        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-        float speed = velocity.magnitude;
-        float speedRatio = speed / car.config.topSpeed;
-
-        float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-        float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
-
-        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
-        float gripForce = -gripFactor * sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
+        float gripForce = -wheelData.gripFactor * wheelData.sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
 
         Vector3 forceVector = gripForce * transform.right;
 
@@ -57,101 +63,92 @@ public class Wheel : MonoBehaviourValidated
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
-    private void ApplyAccelerationForce()
+    private void ApplyAccelerationForce(WheelData wheelData)
     {
         if (IsMotorWheel)
         {
-            Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-            float speed = velocity.magnitude;
-            float speedRatio = speed / car.config.topSpeed;
-
-            float forwardComponent = Vector3.Dot(transform.forward, velocity);
-            float forwardRatio = forwardComponent / car.config.topSpeed;
-
-            float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-            float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
-
-            float motorTorqueFactor = Mathf.Clamp(car.inputData.accelerate * car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(sidewaysRatio) * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(forwardRatio), -1.0f, 1.0f);
+            float motorTorqueFactor = Mathf.Clamp(car.inputData.accelerate * car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(wheelData.forwardRatio), -1.0f, 1.0f);
             float motorTorque = motorTorqueFactor * car.config.motorMaxTorque;
 
-            float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
-
-            Vector3 forceVector = gripFactor * motorTorque * transform.forward;
+            Vector3 forceVector = wheelData.gripFactor * motorTorque * transform.forward;
 
             Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
             car.RB.AddForceAtPosition(forceVector, transform.position);
         }
     }
 
-    private void ApplyBrakeForce(float input)
+    private void ApplyBrakeForce(float input, WheelData wheelData)
     {
-        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-        float speed = velocity.magnitude;
-        float speedRatio = speed / car.config.topSpeed;
+        float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(wheelData.forwardRatio);
+        float brakeForce = -brakeFactor * wheelData.forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
 
-        float forwardComponent = Vector3.Dot(transform.forward, velocity);
-        float forwardRatio = Mathf.Abs(forwardComponent / car.config.topSpeed);
-
-        float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-        float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
-
-        float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(forwardRatio);
-        float brakeForce = -brakeFactor * forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
-
-        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
-
-        Vector3 forceVector = brakeForce * gripFactor * transform.forward;
+        Vector3 forceVector = brakeForce * wheelData.gripFactor * transform.forward;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
     }
 
+    private WheelData CalculateWheelData()
+    {
+        WheelData wheelData = new WheelData();
+
+        wheelData.velocity = car.RB.GetPointVelocity(transform.position);
+        wheelData.speed = wheelData.velocity.magnitude;
+        wheelData.speedRatio = wheelData.speed / car.config.topSpeed;
+
+        wheelData.forwardComponent = Vector3.Dot(transform.forward, wheelData.velocity);
+        wheelData.forwardRatio = wheelData.forwardComponent / car.config.topSpeed;
+
+        wheelData.sidewaysComponent = Vector3.Dot(transform.right, wheelData.velocity);
+        wheelData.sidewaysRatio = Mathf.Abs(wheelData.sidewaysComponent / wheelData.speed);
+
+        wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
+
+        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio);
+
+        return wheelData;
+    }
+
     private void FixedUpdate()
     {
-        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-        float speed = velocity.magnitude;
-        float speedRatio = speed / car.config.topSpeed;
-
-        float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-        float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
+        WheelData wheelData = CalculateWheelData();
 
         if (IsSteeringWheel)
         {
-            float forwardComponent = Vector3.Dot(transform.forward, velocity);
-            float forwardRatio = Mathf.Abs(forwardComponent / car.config.topSpeed);
-
-            float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
+            float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(wheelData.forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(wheelData.sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
 
             transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
         }
 
-        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
+        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius))
+        {
+            grounded = true;
 
-        if (gripFactor < smokeThreshold && !isSmokePlaying)
+            springLength = hitInfo.distance - car.config.wheelRadius;
+
+            ApplySuspensionForce(wheelData);
+            ApplySteeringForce(wheelData);
+            ApplyAccelerationForce(wheelData);
+            ApplyBrakeForce(car.inputData.brake, wheelData);
+
+            if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
+        }
+        else
+        {
+            grounded = false;
+
+            springLength = car.config.springMaxTravel;
+        }
+
+        if (grounded && wheelData.gripFactor < smokeThreshold && !isSmokePlaying)
         {
             driftSmoke.Play();
             isSmokePlaying = true;
         }
-        if (gripFactor > smokeThreshold && isSmokePlaying)
+        if ((!grounded || wheelData.gripFactor > smokeThreshold) && isSmokePlaying)
         {
             driftSmoke.Stop();
             isSmokePlaying = false;
-        }
-
-        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius))
-        {
-            springLength = hitInfo.distance - car.config.wheelRadius;
-
-            ApplySuspensionForce();
-            ApplySteeringForce();
-            ApplyAccelerationForce();
-            ApplyBrakeForce(car.inputData.brake);
-
-            if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f);
-        }
-        else
-        {
-            springLength = car.config.springMaxTravel;
         }
     }
 
@@ -168,18 +165,8 @@ public class Wheel : MonoBehaviourValidated
         if (Application.isPlaying) Gizmos.DrawLine(transform.position, WheelPosition);
         else Gizmos.DrawLine(transform.position, transform.position + (car.config.springRestDistance * -transform.up));
 
-        {
-            Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-            float speed = velocity.magnitude;
-            float speedRatio = speed / car.config.topSpeed;
-
-            float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-            float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
-
-            float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
-
-            Gizmos.color = Color.Lerp(Color.red, Color.green, gripFactor);
-        }
+        WheelData wheelData = CalculateWheelData();
+        Gizmos.color = Color.Lerp(Color.red, Color.green, wheelData.gripFactor);
 
         if (Application.isPlaying) Gizmos.DrawSphere(WheelPosition, car.config.wheelRadius);
         else Gizmos.DrawSphere(transform.position + (car.config.springRestDistance * -transform.up), car.config.wheelRadius);
