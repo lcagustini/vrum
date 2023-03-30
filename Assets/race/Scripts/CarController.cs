@@ -14,7 +14,6 @@ public class CarController : MonoBehaviourValidated
         public float brake;
         public Vector2 camera;
 
-        public bool powerTurn;
         public int gear;
     }
 
@@ -41,18 +40,6 @@ public class CarController : MonoBehaviourValidated
 
     private void Update()
     {
-        {
-            if (!inputData.powerTurn && inputData.accelerate > 0.5f && inputData.brake > 0.5f && Mathf.Abs(inputData.steer) > 0.5f)
-            {
-                inputData.powerTurn = true;
-                inputData.brake = 0;
-            }
-            if (inputData.powerTurn && (Mathf.Abs(inputData.steer) < 0.1f || inputData.accelerate < 0.1f))
-            {
-                inputData.powerTurn = false;
-            }
-        }
-
         if (automaticTransmission && inputData.accelerate > 0.1f && inputData.gear > 0)
         {
             Vector3 velocity = RB.GetPointVelocity(transform.position);

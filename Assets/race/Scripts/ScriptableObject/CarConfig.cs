@@ -29,18 +29,19 @@ public class CarConfig : ScriptableObject
     public AnimationCurve brakeResponseCurve;
 
     public float wheelRadius;
-    public float wheelNormalTurnDegrees;
-    public float wheelPowerTurnDegrees;
     public float wheelMass;
+
+    public AnimationCurve wheelSidewaysTurnModifier;
+    public AnimationCurve wheelForwardTurnModifier;
+    public float wheelMaxTurnDegrees;
 
     public float springMaxTravel;
     public float springRestDistance;
     public float springStrength;
     public float dampingStrength;
 
-    public List<AnimationCurve> accelerationSteeringFactorCurves;
+    public List<AnimationCurve> steeringAccelerationFactorCurves;
 
     public List<AnimationCurve> sidewaysGripFactorCurves;
     public List<AnimationCurve> speedGripFactorCurves;
-    public float gripMultiplier;
 }

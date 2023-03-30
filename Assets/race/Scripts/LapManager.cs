@@ -8,15 +8,19 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 {
     public class LapTracker
     {
-        public float lapStartTime;
+        public float currentLapStartTime;
         public int lap;
         public int checkpoint;
 
+        public List<float> lapTimes;
+
         public LapTracker(float lapStartTime, int lap, int checkpoint)
         {
-            this.lapStartTime = lapStartTime;
+            this.currentLapStartTime = lapStartTime;
             this.lap = lap;
             this.checkpoint = checkpoint;
+
+            lapTimes = new List<float>();
         }
     }
 
@@ -37,10 +41,23 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
         if (order == 0 && checkpointTracker[car].checkpoint == checkpoints.Max(c => c.order))
         {
-            Debug.Log($"Lap {checkpointTracker[car].lap}: {Time.timeSinceLevelLoad - checkpointTracker[car].lapStartTime}");
+            checkpointTracker[car].lapTimes.Add(Time.timeSinceLevelLoad - checkpointTracker[car].currentLapStartTime);
             checkpointTracker[car].checkpoint = 0;
             checkpointTracker[car].lap++;
-            checkpointTracker[car].lapStartTime = Time.timeSinceLevelLoad;
+            checkpointTracker[car].currentLapStartTime = Time.timeSinceLevelLoad;
+
+            Debug.Log($"Lap {checkpointTracker[car].lapTimes.Count}: {checkpointTracker[car].lapTimes[checkpointTracker[car].lapTimes.Count - 1]}");
         }
+    }
+
+    public float GetRunningTime(CarController car)
+    {
+        return Time.timeSinceLevelLoad - checkpointTracker[car].currentLapStartTime;
+    }
+
+    public float GetBestTime(CarController car)
+    {
+        if (checkpointTracker[car].lapTimes.Count == 0) return 0;
+        return checkpointTracker[car].lapTimes.Min();
     }
 }
