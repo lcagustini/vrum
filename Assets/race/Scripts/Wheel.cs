@@ -3,11 +3,15 @@ using Unity.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Wheel : MonoBehaviourValidated
 {
     [SerializeField, Parent] private CarController car;
-    [SerializeField, Child(Flag.Optional)] private ParticleSystem driftSmoke;
+
+    [SerializeField, Child(Flag.Optional)] private VisualEffect driftSmoke;
+    private bool isSmokePlaying;
+
     [SerializeField, Anywhere] public Transform wheelVisual;
 
     [SerializeField] private WheelType wheelType;
@@ -104,6 +108,36 @@ public class Wheel : MonoBehaviourValidated
 
     private void FixedUpdate()
     {
+        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
+        float speed = velocity.magnitude;
+        float speedRatio = speed / car.config.topSpeed;
+
+        float sidewaysComponent = Vector3.Dot(transform.right, velocity);
+        float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
+
+        if (IsSteeringWheel)
+        {
+            float forwardComponent = Vector3.Dot(transform.forward, velocity);
+            float forwardRatio = Mathf.Abs(forwardComponent / car.config.topSpeed);
+
+            float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
+
+            transform.rotation = car.transform.rotation * Quaternion.AngleAxis(turnAmount * car.inputData.steer, transform.up);
+        }
+
+        float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
+
+        if (gripFactor < smokeThreshold && !isSmokePlaying)
+        {
+            driftSmoke.Play();
+            isSmokePlaying = true;
+        }
+        if (gripFactor > smokeThreshold && isSmokePlaying)
+        {
+            driftSmoke.Stop();
+            isSmokePlaying = false;
+        }
+
         if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius))
         {
             springLength = hitInfo.distance - car.config.wheelRadius;
@@ -123,25 +157,6 @@ public class Wheel : MonoBehaviourValidated
 
     private void Update()
     {
-        Vector3 velocity = car.RB.GetPointVelocity(transform.position);
-        float speed = velocity.magnitude;
-
-        float sidewaysComponent = Vector3.Dot(transform.right, velocity);
-        float sidewaysRatio = Mathf.Abs(sidewaysComponent / speed);
-
-        if (IsSteeringWheel)
-        {
-            float forwardComponent = Vector3.Dot(transform.forward, velocity);
-            float forwardRatio = Mathf.Abs(forwardComponent / car.config.topSpeed);
-
-            float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
-
-            transform.rotation = car.transform.rotation * Quaternion.AngleAxis(turnAmount * car.inputData.steer, transform.up);
-        }
-
-        if (sidewaysRatio > smokeThreshold && !driftSmoke.isPlaying) driftSmoke.Play();
-        if (sidewaysRatio < smokeThreshold && driftSmoke.isPlaying) driftSmoke.Stop();
-
         wheelVisual.transform.position = WheelPosition;
         wheelVisual.transform.rotation = transform.rotation;
     }
