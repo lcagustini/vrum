@@ -122,7 +122,7 @@ public class Wheel : MonoBehaviourValidated
 
             float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
 
-            transform.rotation = car.transform.rotation * Quaternion.AngleAxis(turnAmount * car.inputData.steer, transform.up);
+            transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
         }
 
         float gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(sidewaysRatio);
@@ -157,8 +157,8 @@ public class Wheel : MonoBehaviourValidated
 
     private void Update()
     {
-        wheelVisual.transform.position = WheelPosition;
-        wheelVisual.transform.rotation = transform.rotation;
+        wheelVisual.transform.position = Vector3.MoveTowards(wheelVisual.transform.position, WheelPosition, 0.1f * Time.deltaTime);
+        wheelVisual.transform.rotation = Quaternion.RotateTowards(wheelVisual.transform.rotation, transform.rotation, 10 * Time.deltaTime);
     }
 
 #if UNITY_EDITOR
