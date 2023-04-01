@@ -100,7 +100,7 @@ public class Wheel : MonoBehaviourValidated
         wheelData.forwardRatio = wheelData.forwardComponent / car.config.topSpeed;
 
         wheelData.sidewaysComponent = Vector3.Dot(transform.right, wheelData.velocity);
-        wheelData.sidewaysRatio = Mathf.Abs(wheelData.sidewaysComponent / wheelData.speed);
+        wheelData.sidewaysRatio = wheelData.speed == 0 ? 0 : Mathf.Abs(wheelData.sidewaysComponent / wheelData.speed);
 
         wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
 
@@ -112,6 +112,15 @@ public class Wheel : MonoBehaviourValidated
     private void FixedUpdate()
     {
         WheelData wheelData = CalculateWheelData();
+
+        if (wheelData.gripFactor < 0.6f)
+        {
+            driftSmoke.SetVector3("Color", new Vector3(1, 0, 0));
+        }
+        else
+        {
+            driftSmoke.SetVector3("Color", new Vector3(1, 1, 1));
+        }
 
         if (IsSteeringWheel)
         {
@@ -140,12 +149,12 @@ public class Wheel : MonoBehaviourValidated
             springLength = car.config.springMaxTravel;
         }
 
-        if (grounded && wheelData.gripFactor < smokeThreshold && !isSmokePlaying)
+        if (grounded && car.inputData.accelerate > 0.5f && wheelData.gripFactor < smokeThreshold && !isSmokePlaying)
         {
             driftSmoke.Play();
             isSmokePlaying = true;
         }
-        if ((!grounded || wheelData.gripFactor > smokeThreshold) && isSmokePlaying)
+        if ((!grounded || car.inputData.accelerate < 0.1f || wheelData.gripFactor > smokeThreshold) && isSmokePlaying)
         {
             driftSmoke.Stop();
             isSmokePlaying = false;

@@ -316,7 +316,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 1, y: 1, z: 1}
+        m_Name: Color
+        m_Overridden: 1
     m_Vector4f:
       m_Array: []
     m_Uint:
@@ -687,7 +690,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 1, y: 1, z: 1}
+        m_Name: Color
+        m_Overridden: 1
     m_Vector4f:
       m_Array: []
     m_Uint:
@@ -870,7 +876,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 1, y: 1, z: 1}
+        m_Name: Color
+        m_Overridden: 1
     m_Vector4f:
       m_Array: []
     m_Uint:
@@ -981,7 +990,10 @@ VisualEffect:
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 1, y: 1, z: 1}
+        m_Name: Color
+        m_Overridden: 1
     m_Vector4f:
       m_Array: []
     m_Uint:
