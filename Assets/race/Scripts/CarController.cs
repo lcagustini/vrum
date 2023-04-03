@@ -15,6 +15,8 @@ public class CarController : MonoBehaviourValidated
         public float brake;
         public Vector2 camera;
 
+        public float drift;
+
         public int gear;
     }
 
@@ -63,6 +65,15 @@ public class CarController : MonoBehaviourValidated
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (inputData.drift > 0)
+        {
+            float angleCos = Mathf.Clamp01(Vector3.Dot(RB.velocity.normalized, transform.forward));
+            RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
+        }
+    }
+
     public void Steer(CallbackContext context)
     {
         inputData.steer = context.ReadValue<float>();
@@ -81,6 +92,11 @@ public class CarController : MonoBehaviourValidated
     public void Camera(CallbackContext context)
     {
         inputData.camera = context.ReadValue<Vector2>();
+    }
+
+    public void Drift(CallbackContext context)
+    {
+        inputData.drift = context.performed ? RB.velocity.magnitude : 0;
     }
 
     public void GearUp(CallbackContext context)

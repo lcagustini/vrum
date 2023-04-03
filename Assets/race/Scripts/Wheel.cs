@@ -43,41 +43,63 @@ public class Wheel : MonoBehaviourValidated
     private bool IsMotorWheel => ((wheelType == WheelType.BackLeft || wheelType == WheelType.BackRight) && (car.config.drivetrain == Drivetrain.RearWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive)) || ((wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight) && (car.config.drivetrain == Drivetrain.FrontWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive));
     private bool IsSteeringWheel => wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight;
 
-    private void ApplySuspensionForce(WheelData wheelData)
+    private Vector3 ApplySuspensionForce(WheelData wheelData)
     {
         float springForce = car.config.springStrength * (car.config.springRestDistance - springLength);
         float dampingForce = car.config.dampingStrength * wheelData.upComponent;
+
         Vector3 forceVector = (springForce - dampingForce) * transform.up;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
+
+        return forceVector;
     }
 
-    private void ApplySteeringForce(WheelData wheelData)
+    private Vector3 ApplySteeringForce(WheelData wheelData)
     {
-        float gripForce = -wheelData.gripFactor * wheelData.sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
+        float gripForce = wheelData.gripFactor * wheelData.sidewaysComponent * car.config.wheelMass / Time.fixedDeltaTime;
 
-        Vector3 forceVector = gripForce * transform.right;
+        Vector3 forceVector = -gripForce * transform.right;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
+
+        return forceVector;
     }
 
-    private void ApplyAccelerationForce(WheelData wheelData)
+    private Vector3 ApplyAccelerationForce(WheelData wheelData)
     {
         if (IsMotorWheel)
         {
-            float motorTorqueFactor = Mathf.Clamp(car.inputData.accelerate * car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(wheelData.forwardRatio), -1.0f, 1.0f);
+            float motorTorqueFactor = car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * Mathf.Clamp(car.inputData.accelerate * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(wheelData.forwardRatio), -1.0f, 1.0f);
             float motorTorque = motorTorqueFactor * car.config.motorMaxTorque;
 
             Vector3 forceVector = wheelData.gripFactor * motorTorque * transform.forward;
 
             Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
             car.RB.AddForceAtPosition(forceVector, transform.position);
+
+            return forceVector;
         }
+
+        return Vector3.zero;
     }
 
-    private void ApplyBrakeForce(float input, WheelData wheelData)
+    private Vector3 ApplyDriftForce(WheelData wheelData)
+    {
+        float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift - wheelData.speed) / (car.inputData.drift + wheelData.speed));
+        float driftTorque = driftFactor * car.config.motorMaxTorque;
+
+        Vector3 forceVector = wheelData.gripFactor * driftTorque * transform.forward;
+
+        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
+        car.RB.AddForceAtPosition(forceVector, transform.position);
+
+        return forceVector;
+    }
+
+    private Vector3 ApplyBrakeForce(float input, WheelData wheelData)
     {
         float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(wheelData.forwardRatio);
         float brakeForce = -brakeFactor * wheelData.forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
@@ -86,6 +108,8 @@ public class Wheel : MonoBehaviourValidated
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
+
+        return forceVector;
     }
 
     private WheelData CalculateWheelData()
@@ -113,18 +137,10 @@ public class Wheel : MonoBehaviourValidated
     {
         WheelData wheelData = CalculateWheelData();
 
-        if (wheelData.gripFactor < 0.6f)
-        {
-            driftSmoke.SetVector3("Color", new Vector3(1, 0, 0));
-        }
-        else
-        {
-            driftSmoke.SetVector3("Color", new Vector3(1, 1, 1));
-        }
-
         if (IsSteeringWheel)
         {
-            float turnAmount = (car.config.wheelForwardTurnModifier.Evaluate(wheelData.forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(wheelData.sidewaysRatio)) * car.config.wheelMaxTurnDegrees;
+            float turnAmountFactor = car.config.wheelForwardTurnModifier.Evaluate(wheelData.forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(wheelData.sidewaysRatio);
+            float turnAmount = turnAmountFactor * car.config.wheelMaxTurnDegrees;
 
             transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
         }
@@ -135,10 +151,16 @@ public class Wheel : MonoBehaviourValidated
 
             springLength = hitInfo.distance - car.config.wheelRadius;
 
+            Vector3 planarForce = Vector3.zero;
+
             ApplySuspensionForce(wheelData);
             ApplySteeringForce(wheelData);
-            ApplyAccelerationForce(wheelData);
-            ApplyBrakeForce(car.inputData.brake, wheelData);
+            planarForce += ApplyAccelerationForce(wheelData);
+            planarForce += ApplyBrakeForce(car.inputData.brake, wheelData);
+            ApplyDriftForce(wheelData);
+
+            Vector3 velocityChange = planarForce * Time.fixedDeltaTime / car.RB.mass;
+            if (car.inputData.drift > 0) car.inputData.drift += Vector3.Dot(velocityChange, transform.forward);
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
         }
@@ -149,22 +171,28 @@ public class Wheel : MonoBehaviourValidated
             springLength = car.config.springMaxTravel;
         }
 
-        if (grounded && car.inputData.accelerate > 0.5f && wheelData.gripFactor < smokeThreshold && !isSmokePlaying)
+        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < smokeThreshold) || car.inputData.drift > 0))
         {
-            driftSmoke.Play();
-            isSmokePlaying = true;
+            if (!isSmokePlaying)
+            {
+                driftSmoke.Play();
+                isSmokePlaying = true;
+            }
         }
-        if ((!grounded || car.inputData.accelerate < 0.1f || wheelData.gripFactor > smokeThreshold) && isSmokePlaying)
+        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > smokeThreshold) && car.inputData.drift <= 0))
         {
-            driftSmoke.Stop();
-            isSmokePlaying = false;
+            if (isSmokePlaying)
+            {
+                driftSmoke.Stop();
+                isSmokePlaying = false;
+            }
         }
     }
 
     private void Update()
     {
-        wheelVisual.transform.position = Vector3.MoveTowards(wheelVisual.transform.position, WheelPosition, 0.1f * Time.deltaTime);
-        wheelVisual.transform.rotation = Quaternion.RotateTowards(wheelVisual.transform.rotation, transform.rotation, 10 * Time.deltaTime);
+        wheelVisual.transform.position = Vector3.MoveTowards(wheelVisual.transform.position, WheelPosition, 1f * Time.deltaTime);
+        wheelVisual.transform.rotation = Quaternion.RotateTowards(wheelVisual.transform.rotation, transform.rotation, 90 * Time.deltaTime);
     }
 
 #if UNITY_EDITOR

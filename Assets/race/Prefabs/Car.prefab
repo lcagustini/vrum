@@ -581,6 +581,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 041afdee-42c4-428e-ade2-35e8f41a7dba
     m_ActionName: Gameplay/Gear Down[/XInputControllerWindows/leftShoulder]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6523819325130521012}
+        m_TargetAssemblyTypeName: CarController, race
+        m_MethodName: Drift
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 372357b0-7bfc-4cec-a137-fc6a66c90d54
+    m_ActionName: Gameplay/Drift[/XInputControllerWindows/buttonSouth]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay

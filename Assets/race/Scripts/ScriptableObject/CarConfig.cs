@@ -42,6 +42,9 @@ public class CarConfig : ScriptableObject
     public float dampingStrength;
 
     public List<AnimationCurve> steeringAccelerationFactorCurves;
+    public List<AnimationCurve> driftAccelerationFactorCurves;
+    public float driftTorqueModifier;
+    public float driftCarAngleModifier;
 
     public List<AnimationCurve> sidewaysGripFactorCurves;
     public List<AnimationCurve> speedGripFactorCurves;
