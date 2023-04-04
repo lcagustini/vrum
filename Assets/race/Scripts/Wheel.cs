@@ -160,7 +160,11 @@ public class Wheel : MonoBehaviourValidated
             ApplyDriftForce(wheelData);
 
             Vector3 velocityChange = planarForce * Time.fixedDeltaTime / car.RB.mass;
-            if (car.inputData.drift.x > 0) car.inputData.drift.y += Vector3.Dot(velocityChange, transform.forward);
+            if (car.inputData.drift.x > 0)
+            {
+                float speedDiff = 2 * Mathf.Abs(car.inputData.drift.x - car.inputData.drift.y) / (car.inputData.drift.x + car.inputData.drift.y);
+                car.inputData.drift.y += (1 - (speedDiff / car.config.driftSpeedDiffLimit)) * Vector3.Dot(velocityChange, transform.forward);
+            }
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
         }

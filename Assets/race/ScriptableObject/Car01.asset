@@ -714,6 +714,7 @@ MonoBehaviour:
   driftTorqueModifier: 5
   driftCarAngleModifier: 60
   gripToDriftThreshold: 0.7
+  driftSpeedDiffLimit: 0.2
   sidewaysGripFactorCurves:
   - serializedVersion: 2
     m_Curve:
