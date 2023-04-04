@@ -7,7 +7,7 @@ using UnityEngine.VFX;
 
 public class Wheel : MonoBehaviourValidated
 {
-    private struct WheelData
+    public struct WheelData
     {
         public Vector3 velocity;
         public float speed;
@@ -29,7 +29,7 @@ public class Wheel : MonoBehaviourValidated
     [SerializeField, Child(Flag.Optional)] private VisualEffect driftSmoke;
     private bool isSmokePlaying;
 
-    [SerializeField, Anywhere] public Transform wheelVisual;
+    [SerializeField, Anywhere] private Transform wheelVisual;
 
     [SerializeField] private WheelType wheelType;
 
@@ -88,7 +88,7 @@ public class Wheel : MonoBehaviourValidated
 
     private Vector3 ApplyDriftForce(WheelData wheelData)
     {
-        float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift - wheelData.speed) / (car.inputData.drift + wheelData.speed));
+        float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift.y - wheelData.speed) / (car.inputData.drift.y + wheelData.speed));
         float driftTorque = driftFactor * car.config.motorMaxTorque;
 
         Vector3 forceVector = wheelData.gripFactor * driftTorque * transform.forward;
@@ -112,7 +112,7 @@ public class Wheel : MonoBehaviourValidated
         return forceVector;
     }
 
-    private WheelData CalculateWheelData()
+    public WheelData CalculateWheelData()
     {
         WheelData wheelData = new WheelData();
 
@@ -128,7 +128,7 @@ public class Wheel : MonoBehaviourValidated
 
         wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
 
-        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio);
+        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.brakeGripLossCurves[(int)wheelType].Evaluate(car.inputData.brake);
 
         return wheelData;
     }
@@ -154,13 +154,13 @@ public class Wheel : MonoBehaviourValidated
             Vector3 planarForce = Vector3.zero;
 
             ApplySuspensionForce(wheelData);
-            ApplySteeringForce(wheelData);
+            planarForce += ApplySteeringForce(wheelData);
             planarForce += ApplyAccelerationForce(wheelData);
             planarForce += ApplyBrakeForce(car.inputData.brake, wheelData);
             ApplyDriftForce(wheelData);
 
             Vector3 velocityChange = planarForce * Time.fixedDeltaTime / car.RB.mass;
-            if (car.inputData.drift > 0) car.inputData.drift += Vector3.Dot(velocityChange, transform.forward);
+            if (car.inputData.drift.x > 0) car.inputData.drift.y += Vector3.Dot(velocityChange, transform.forward);
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
         }
@@ -171,7 +171,7 @@ public class Wheel : MonoBehaviourValidated
             springLength = car.config.springMaxTravel;
         }
 
-        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < smokeThreshold) || car.inputData.drift > 0))
+        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < smokeThreshold) || car.inputData.drift.x > 0))
         {
             if (!isSmokePlaying)
             {
@@ -179,7 +179,7 @@ public class Wheel : MonoBehaviourValidated
                 isSmokePlaying = true;
             }
         }
-        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > smokeThreshold) && car.inputData.drift <= 0))
+        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > smokeThreshold) && car.inputData.drift.x <= 0))
         {
             if (isSmokePlaying)
             {

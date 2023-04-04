@@ -15,12 +15,13 @@ public class CarController : MonoBehaviourValidated
         public float brake;
         public Vector2 camera;
 
-        public float drift;
+        public Vector2 drift;
 
         public int gear;
     }
 
     [SerializeField, Self] public Rigidbody RB;
+    [SerializeField, Child] public Wheel[] wheels;
 
     public CarConfig config;
 
@@ -67,7 +68,29 @@ public class CarController : MonoBehaviourValidated
 
     private void FixedUpdate()
     {
-        if (inputData.drift > 0)
+        float gripFactor = 0;
+        float speedRatio = 0;
+        foreach (Wheel wheel in wheels)
+        {
+            Wheel.WheelData wheelData = wheel.CalculateWheelData();
+            gripFactor += wheelData.gripFactor;
+            speedRatio += wheelData.speedRatio;
+        }
+        gripFactor /= wheels.Length;
+        speedRatio /= wheels.Length;
+
+        if (gripFactor < config.gripToDriftThreshold && inputData.drift.x <= 0)
+        {
+            inputData.drift.x = RB.velocity.magnitude;
+            inputData.drift.y = RB.velocity.magnitude;
+        }
+        if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f)
+        {
+            inputData.drift.x = 0;
+            inputData.drift.y = 0;
+        }
+
+        if (inputData.drift.x > 0)
         {
             float angleCos = Mathf.Clamp01(Vector3.Dot(RB.velocity.normalized, transform.forward));
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
@@ -92,11 +115,6 @@ public class CarController : MonoBehaviourValidated
     public void Camera(CallbackContext context)
     {
         inputData.camera = context.ReadValue<Vector2>();
-    }
-
-    public void Drift(CallbackContext context)
-    {
-        inputData.drift = context.performed ? RB.velocity.magnitude : 0;
     }
 
     public void GearUp(CallbackContext context)

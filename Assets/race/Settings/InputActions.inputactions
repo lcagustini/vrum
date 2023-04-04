@@ -58,15 +58,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Drift",
-                    "type": "Button",
-                    "id": "372357b0-7bfc-4cec-a137-fc6a66c90d54",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -133,17 +124,6 @@
                     "processors": "",
                     "groups": "DefaultScheme",
                     "action": "Gear Down",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "212271ce-ed63-4c01-a005-ab5982d3c633",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "DefaultScheme",
-                    "action": "Drift",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

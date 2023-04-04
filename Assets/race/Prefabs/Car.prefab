@@ -49,7 +49,7 @@ MonoBehaviour:
   driftSmoke: {fileID: 7724594272612922197}
   wheelVisual: {fileID: 9087314633085320923}
   wheelType: 2
-  smokeThreshold: 0.66
+  smokeThreshold: 0.7
 --- !u!1 &1098882561514860312
 GameObject:
   m_ObjectHideFlags: 0
@@ -99,7 +99,7 @@ MonoBehaviour:
   driftSmoke: {fileID: 6949038154613605771}
   wheelVisual: {fileID: 4155792807737797949}
   wheelType: 3
-  smokeThreshold: 0.66
+  smokeThreshold: 0.7
 --- !u!1 &1632695262086135916
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,7 +149,7 @@ MonoBehaviour:
   driftSmoke: {fileID: 6518701840365910624}
   wheelVisual: {fileID: 4920036575784588605}
   wheelType: 0
-  smokeThreshold: 0.66
+  smokeThreshold: 0.7
 --- !u!1 &1815233968014196796
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,7 +415,7 @@ Transform:
   - {fileID: 5974858394001917716}
   - {fileID: 3130850869029505938}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &6901182554982092200
 Rigidbody:
@@ -457,6 +457,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RB: {fileID: 6901182554982092200}
+  wheels:
+  - {fileID: 3790763128595972324}
+  - {fileID: 470245864800640470}
+  - {fileID: 6043610403124926689}
+  - {fileID: 750876387669837410}
   config: {fileID: 11400000, guid: c79cb2b99050a8649a001f75c36206af, type: 2}
   automaticTransmission: 1
 --- !u!114 &2625404590673165889
@@ -581,22 +586,6 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 041afdee-42c4-428e-ade2-35e8f41a7dba
     m_ActionName: Gameplay/Gear Down[/XInputControllerWindows/leftShoulder]
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6523819325130521012}
-        m_TargetAssemblyTypeName: CarController, race
-        m_MethodName: Drift
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 372357b0-7bfc-4cec-a137-fc6a66c90d54
-    m_ActionName: Gameplay/Drift[/XInputControllerWindows/buttonSouth]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
@@ -651,7 +640,7 @@ MonoBehaviour:
   driftSmoke: {fileID: 7767670846010104431}
   wheelVisual: {fileID: 2636706116607594499}
   wheelType: 1
-  smokeThreshold: 0.66
+  smokeThreshold: 0.7
 --- !u!1 &5233062642616997474
 GameObject:
   m_ObjectHideFlags: 0
