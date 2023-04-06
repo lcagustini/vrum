@@ -91,7 +91,7 @@ public class Wheel : MonoBehaviourValidated
         float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift.y - wheelData.speed) / (car.inputData.drift.y + wheelData.speed));
         float driftTorque = driftFactor * car.config.motorMaxTorque;
 
-        Vector3 forceVector = wheelData.gripFactor * driftTorque * transform.forward;
+        Vector3 forceVector = wheelData.gripFactor * driftTorque * wheelData.velocity.normalized;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
@@ -163,7 +163,10 @@ public class Wheel : MonoBehaviourValidated
             if (car.inputData.drift.x > 0)
             {
                 float speedDiff = 2 * Mathf.Abs(car.inputData.drift.x - car.inputData.drift.y) / (car.inputData.drift.x + car.inputData.drift.y);
-                car.inputData.drift.y += (1 - (speedDiff / car.config.driftSpeedDiffLimit)) * Vector3.Dot(velocityChange, transform.forward);
+                float speedDot = Vector3.Dot(velocityChange, transform.forward);
+                float negativeModifier = 1 - (speedDiff / car.config.driftSpeedDiffLimit.x);
+                float positiveModifier = 1 - (speedDiff / car.config.driftSpeedDiffLimit.y);
+                car.inputData.drift.y += (speedDot > 0 ? positiveModifier : negativeModifier) * speedDot;
             }
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);

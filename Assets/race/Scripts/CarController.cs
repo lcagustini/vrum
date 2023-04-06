@@ -79,12 +79,13 @@ public class CarController : MonoBehaviourValidated
         gripFactor /= wheels.Length;
         speedRatio /= wheels.Length;
 
+        float directionDot = Vector3.Dot(transform.forward, RB.velocity.normalized);
         if (gripFactor < config.gripToDriftThreshold && inputData.drift.x <= 0)
         {
             inputData.drift.x = RB.velocity.magnitude;
             inputData.drift.y = RB.velocity.magnitude;
         }
-        if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f)
+        if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f || directionDot > 0.995f)
         {
             inputData.drift.x = 0;
             inputData.drift.y = 0;
@@ -92,7 +93,7 @@ public class CarController : MonoBehaviourValidated
 
         if (inputData.drift.x > 0)
         {
-            float angleCos = Mathf.Clamp01(Vector3.Dot(RB.velocity.normalized, transform.forward));
+            float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
         }
     }
