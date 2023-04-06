@@ -91,7 +91,8 @@ public class Wheel : MonoBehaviourValidated
         float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift.y - wheelData.speed) / (car.inputData.drift.y + wheelData.speed));
         float driftTorque = driftFactor * car.config.motorMaxTorque;
 
-        Vector3 forceVector = wheelData.gripFactor * driftTorque * wheelData.velocity.normalized;
+        Vector3 halfwayVector = (wheelData.velocity.normalized + transform.forward).normalized;
+        Vector3 forceVector = wheelData.gripFactor * driftTorque * halfwayVector;
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
@@ -145,7 +146,7 @@ public class Wheel : MonoBehaviourValidated
             transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
         }
 
-        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius))
+        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius, LayerMask.GetMask("GroundCollider")))
         {
             grounded = true;
 
