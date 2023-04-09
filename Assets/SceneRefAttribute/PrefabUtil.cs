@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     // Subset taken from KBCore.Utils.PrefabUtil for open sourcing
     internal class PrefabUtil

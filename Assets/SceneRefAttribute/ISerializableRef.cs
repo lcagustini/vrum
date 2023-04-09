@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     internal interface ISerializableRef
     {

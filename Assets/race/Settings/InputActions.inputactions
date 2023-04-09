@@ -128,6 +128,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Menu",
+            "id": "b7825a92-73de-4438-9cf4-47f01beced88",
+            "actions": [
+                {
+                    "name": "Submit",
+                    "type": "Button",
+                    "id": "65a11e94-de48-4c39-a2b6-3240da19067e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8d04b82b-792c-4342-9c16-bf32c7f921c3",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "DefaultScheme",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     /// <summary>
     /// RefLoc indicates the expected location of the reference.
@@ -28,6 +28,11 @@ namespace SceneRefAttributes
         /// using GetComponent(s)InChildren()
         /// </summary>
         Child = 2,
+        /// <summary>
+        /// Scene looks for the reference anywhere in the scene
+        /// using GameObject.FindAnyObjectByType() and GameObject.FindObjectsOfType()
+        /// </summary>
+        Scene = 4,
     }
     
     /// <summary>
@@ -114,6 +119,18 @@ namespace SceneRefAttributes
     {
         public ChildAttribute(Flag flags = Flag.None) 
             : base(RefLoc.Child, flags: flags)
+        {}
+    }
+    
+    /// <summary>
+    /// Scene looks for the reference anywhere in the scene
+    /// using GameObject.FindAnyObjectByType() and GameObject.FindObjectsOfType()
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class SceneAttribute : SceneRefAttribute
+    {
+        public SceneAttribute(Flag flags = Flag.None) 
+            : base(RefLoc.Scene, flags: flags)
         {}
     }
 }

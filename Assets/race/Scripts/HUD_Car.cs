@@ -1,4 +1,4 @@
-using SceneRefAttributes;
+using KBCore.Refs;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ public class HUD_Car : MonoBehaviourValidated
     [SerializeField, Anywhere] private TextMeshProUGUI bestTime;
     [SerializeField, Anywhere] private TextMeshProUGUI currentTime;
 
-    private CarController car;
+    private Car car;
 
     private string FormatTime(float time)
     {
@@ -29,17 +29,20 @@ public class HUD_Car : MonoBehaviourValidated
 
     private void Update()
     {
-        if (car == null) car = FindObjectOfType<CarController>();
+        if (car == null) car = FindObjectOfType<Car>();
 
-        speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
-        gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
-        gearRatio.value = car.GetGearRatio();
+        if (car != null)
+        {
+            speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
+            gear.text = car.controller.inputData.gear == 0 ? "R" : car.controller.inputData.gear.ToString();
+            gearRatio.value = car.GetGearRatio();
 
-        if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
-        else if (gearRatio.value > 0.75f) gearRatioImage.color = Color.yellow;
-        else gearRatioImage.color = Color.white;
+            if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
+            else if (gearRatio.value > 0.75f) gearRatioImage.color = Color.yellow;
+            else gearRatioImage.color = Color.white;
 
-        bestTime.text = FormatTime(LapManager.Instance.GetBestTime(car));
-        currentTime.text = FormatTime(LapManager.Instance.GetRunningTime(car));
+            bestTime.text = FormatTime(LapManager.Instance.GetBestTime(car));
+            currentTime.text = FormatTime(LapManager.Instance.GetRunningTime(car));
+        }
     }
 }

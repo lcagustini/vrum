@@ -9,13 +9,13 @@ using Object = UnityEngine.Object;
 using UnityEditor;
 #endif
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     public static class SceneRefAttributeValidator
     {
-        
+
 #if UNITY_EDITOR
-        private static readonly List<ReflectionUtil.AttributedField<SceneRefAttribute>> ATTRIBUTED_FIELDS_CACHE = new();
+        private static readonly List<ReflectionUtil.AttributedField<SceneRefAttribute>> ATTRIBUTED_FIELDS_CACHE = new List<ReflectionUtil.AttributedField<SceneRefAttribute>>();
 
         /// <summary>
         /// Validate all references for every script and every game object in the scene.
@@ -99,7 +99,7 @@ namespace SceneRefAttributes
         {
             if (requiredFields.Count == 0)
             {
-                Debug.LogError($"{c.GetType().Name} has no required fields", c.gameObject);
+                Debug.LogWarning($"{c.GetType().Name} has no required fields", c.gameObject);
                 return;
             }
 
@@ -138,6 +138,7 @@ namespace SceneRefAttributes
             
             bool isArray = fieldType.IsArray;
             bool includeInactive = attr.HasFlags(Flag.IncludeInactive);
+            FindObjectsInactive includeInactiveObjects = includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude;
             
             Type elementType = fieldType;
             if (isArray)
@@ -145,12 +146,10 @@ namespace SceneRefAttributes
                 elementType = fieldType.GetElementType();
                 if (typeof(ISerializableRef).IsAssignableFrom(elementType))
                 {
-                    var interfaceType = elementType.GetInterfaces().FirstOrDefault(type =>
+                    Type interfaceType = elementType?.GetInterfaces().FirstOrDefault(type =>
                         type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISerializableRef<>));
                     if (interfaceType != null)
-                    {
                         elementType = interfaceType.GetGenericArguments()[0];
-                    }
                 }
             }
             
@@ -173,6 +172,12 @@ namespace SceneRefAttributes
                     value = isArray
                         ? c.GetComponentsInChildren(elementType, includeInactive)
                         : c.GetComponentInChildren(elementType, includeInactive);
+                    break;
+                case RefLoc.Scene:
+                    FindObjectsSortMode findObjectsSortMode = FindObjectsSortMode.None;
+                    value = isArray
+                        ? GameObject.FindObjectsByType(elementType, includeInactiveObjects, findObjectsSortMode)
+                        : GameObject.FindAnyObjectByType(elementType, includeInactiveObjects);
                     break;
                 default:
                     throw new Exception($"Unhandled Loc={attr.Loc}");
@@ -198,17 +203,16 @@ namespace SceneRefAttributes
                 }
                 else if (typeof(ISerializableRef).IsAssignableFrom(realElementType))
                 {
-                    for (var i = 0; i < typedArray.Length; i++)
+                    for (int i = 0; i < typedArray.Length; i++)
                     {
-                        var elementValue = Activator.CreateInstance(realElementType) as ISerializableRef;
+                        ISerializableRef elementValue = Activator.CreateInstance(realElementType) as ISerializableRef;
                         elementValue?.OnSerialize(componentArray.GetValue(i));
                         typedArray.SetValue(elementValue, i);
                     }
                     value = typedArray;
                 }
             }
-
-
+            
             if (iSerializable != null)
             {
                 if (!iSerializable.OnSerialize(value))
@@ -247,12 +251,25 @@ namespace SceneRefAttributes
                 {
                     object o = a.GetValue(i);
                     if (o is ISerializableRef serObj) o = serObj.SerializedObject;
-                    ValidateRefLocation(attr.Loc, c, field, (Component) o);
+                    ValidateRefLocation(attr.Loc, c, field, o);
                 }
             }
             else
             {
-                ValidateRefLocation(attr.Loc, c, field, (Component) value);
+                ValidateRefLocation(attr.Loc, c, field, value);
+            }
+        }
+
+        private static void ValidateRefLocation(RefLoc loc, Component c, FieldInfo field, object refObj)
+        {
+            switch (refObj)
+            {
+                case Component valueC:
+                    ValidateRefLocation(loc, c, field, valueC);
+                    break;
+                case ScriptableObject valueSO:
+                    ValidateRefLocation(loc, c, field, valueSO);
+                    break;
             }
         }
 
@@ -278,6 +295,29 @@ namespace SceneRefAttributes
                         Debug.LogError($"{c.GetType().Name} requires {field.FieldType.Name} ref '{field.Name}' to be a Child", c.gameObject);
                     break;
                     
+                case RefLoc.Scene:
+                    if (c == null)
+                        Debug.LogError($"{c.GetType().Name} requires {field.FieldType.Name} ref '{field.Name}' to be in the scene", c.gameObject);
+                    break;
+
+                default:
+                    throw new Exception($"Unhandled Loc={loc}");
+            }
+        }
+
+        private static void ValidateRefLocation(RefLoc loc, Component c, FieldInfo field, ScriptableObject refObj)
+        {
+            switch (loc)
+            {
+                case RefLoc.Anywhere:
+                    break;
+
+                case RefLoc.Self:
+                case RefLoc.Parent:
+                case RefLoc.Child:
+                    Debug.LogError($"{c.GetType().Name} requires {field.FieldType.Name} ref '{field.Name}' to be a Anywhere only", c.gameObject);
+                    break;
+
                 default:
                     throw new Exception($"Unhandled Loc={loc}");
             }

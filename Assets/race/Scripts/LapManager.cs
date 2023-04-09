@@ -1,4 +1,4 @@
-using SceneRefAttributes;
+using KBCore.Refs;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
@@ -25,14 +25,19 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
     }
 
     [SerializeField, Child] private CheckpointCollider[] checkpoints;
-    public Dictionary<CarController, LapTracker> checkpointTracker = new Dictionary<CarController, LapTracker>();
+    public Dictionary<Car, LapTracker> checkpointTracker = new Dictionary<Car, LapTracker>();
 
     private void Start()
     {
         CheckpointCollider checkpoint = checkpoints.First(c => c.order == 0);
     }
 
-    public void UpdateCheckpoint(CarController car, int order)
+    public CheckpointCollider GetLastCollider()
+    {
+        return checkpoints[checkpoints.Length - 1];
+    }
+
+    public void UpdateCheckpoint(Car car, int order)
     {
         if (order == checkpointTracker[car].checkpoint + 1)
         {
@@ -50,12 +55,12 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
         }
     }
 
-    public float GetRunningTime(CarController car)
+    public float GetRunningTime(Car car)
     {
         return Time.timeSinceLevelLoad - checkpointTracker[car].currentLapStartTime;
     }
 
-    public float GetBestTime(CarController car)
+    public float GetBestTime(Car car)
     {
         if (checkpointTracker[car].lapTimes.Count == 0) return 0;
         return checkpointTracker[car].lapTimes.Min();

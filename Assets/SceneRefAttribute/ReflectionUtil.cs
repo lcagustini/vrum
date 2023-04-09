@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     internal class ReflectionUtil
     {

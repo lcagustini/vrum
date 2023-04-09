@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c2f03190c495340be41535043fbba1, type: 3}
   m_Name: Car01
   m_EditorClassIdentifier: 
+  carMass: 1500
+  centerOfMass: {x: 0, y: -0.36, z: 0}
   topSpeed: 90
   drivetrain: 0
   automaticGearLimits: {x: 0.4, y: 0.9}
@@ -319,7 +321,7 @@ MonoBehaviour:
       outWeight: 0.56738114
     - serializedVersion: 3
       time: 1
-      value: 0.6
+      value: 0.5
       inSlope: -6.438615
       outSlope: -6.438615
       tangentMode: 0
@@ -351,7 +353,7 @@ MonoBehaviour:
       outWeight: 0.56738114
     - serializedVersion: 3
       time: 1
-      value: 0.6
+      value: 0.5
       inSlope: -6.438615
       outSlope: -6.438615
       tangentMode: 0
@@ -383,7 +385,7 @@ MonoBehaviour:
       outWeight: 0.56738114
     - serializedVersion: 3
       time: 1
-      value: 0.6
+      value: 0.5
       inSlope: -6.438615
       outSlope: -6.438615
       tangentMode: 0
@@ -415,7 +417,7 @@ MonoBehaviour:
       outWeight: 0.56738114
     - serializedVersion: 3
       time: 1
-      value: 0.6
+      value: 0.5
       inSlope: -6.438615
       outSlope: -6.438615
       tangentMode: 0
@@ -712,8 +714,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   driftTorqueModifier: 5
-  driftCarAngleModifier: 70
-  gripToDriftThreshold: 0.7
+  driftCarAngleModifier: 50
+  gripToDriftThreshold: 0.65
+  smokeThreshold: 0.7
   driftSpeedDiffLimit: {x: 0.2, y: 0.05}
   driftRotationScaling:
     serializedVersion: 2

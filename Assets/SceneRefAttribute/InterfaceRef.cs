@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SceneRefAttributes
+namespace KBCore.Refs
 {
     /// <summary>
     /// Allows for serializing Interface types with [SceneRef] attributes.
