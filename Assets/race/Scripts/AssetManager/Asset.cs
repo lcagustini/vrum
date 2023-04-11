@@ -75,3 +75,10 @@ public class CarAsset : Asset
     public AssetReference carModel;
     public CarConfig carConfig;
 }
+
+[System.Serializable]
+public class TrackAsset : Asset
+{
+    public AssetReference trackModel;
+    public AssetReference trackData;
+}

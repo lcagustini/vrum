@@ -8,8 +8,21 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class AssetContainer : PersistentSingletonMonobehaviour<AssetContainer>
 {
     public CarAsset[] carAssets;
+    public TrackAsset[] trackAssets;
 
     private Dictionary<AssetReference, AsyncOperationHandle<Object>> handles = new Dictionary<AssetReference, AsyncOperationHandle<Object>>();
+
+    public GameObject Instantiate(AssetReference asset)
+    {
+        GameObject prefab = GetLoadedAsset(asset);
+        return Instantiate(prefab);
+    }
+
+    public GameObject Instantiate(AssetReference asset, Transform parent)
+    {
+        GameObject prefab = GetLoadedAsset(asset);
+        return Instantiate(prefab, parent);
+    }
 
     public T Instantiate<T>(AssetReference asset) where T : Component
     {

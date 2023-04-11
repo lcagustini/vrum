@@ -34,7 +34,7 @@ public class HUD_Car : MonoBehaviourValidated
         if (car != null)
         {
             speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
-            gear.text = car.controller.inputData.gear == 0 ? "R" : car.controller.inputData.gear.ToString();
+            gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
             gearRatio.value = car.GetGearRatio();
 
             if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;

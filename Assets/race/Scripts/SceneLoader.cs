@@ -10,6 +10,7 @@ public class SceneLoader : PersistentSingletonMonobehaviour<SceneLoader>
     public struct PlayData
     {
         public string carAssetID;
+        public string trackAssetID;
     }
 
     public PlayData playData;

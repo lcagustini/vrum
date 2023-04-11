@@ -47,6 +47,26 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 76baade1b1992f74cba370e9f7ef32bf
+    m_Address: Assets/race/Prefabs/Tracks/Track 1/Track 1 Data.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3576b457d461ca04b8e740ee5fa015a5
+    m_Address: Assets/race/Prefabs/Tracks/Track 1/Track 1 Model.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47c654c773ac1804592a3c3faf5b2e15
+    m_Address: Assets/race/Prefabs/Tracks/Track 2/Track 2 Data.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f349b19d2a7749d42b82c9819d9ce885
+    m_Address: Assets/race/Prefabs/Tracks/Track 2/Track 2 Model.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fa1c57dd01d19f94cb05621c98021009, type: 2}
   m_SchemaSet:

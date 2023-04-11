@@ -46,28 +46,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carAssets:
-  - assetID: DRIFTY
-    car:
-      m_AssetGUID: e021af36e721a334884f904084586bc8
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    carTemplate:
-      m_AssetGUID: 9efedc66feda22a4cb485c9cb4d5df1a
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    carController:
-      m_AssetGUID: b21c39d6954d77942a5be2f8199cde21
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    carModel:
-      m_AssetGUID: 009b218718b671e46b0f0cbcc02ac4c9
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    carConfig: {fileID: 11400000, guid: c79cb2b99050a8649a001f75c36206af, type: 2}
   - assetID: SEDAN
     car:
       m_AssetGUID: e021af36e721a334884f904084586bc8
@@ -112,6 +90,51 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
     carConfig: {fileID: 11400000, guid: c79cb2b99050a8649a001f75c36206af, type: 2}
+  - assetID: DRIFTY
+    car:
+      m_AssetGUID: e021af36e721a334884f904084586bc8
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    carTemplate:
+      m_AssetGUID: 9efedc66feda22a4cb485c9cb4d5df1a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    carController:
+      m_AssetGUID: b21c39d6954d77942a5be2f8199cde21
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    carModel:
+      m_AssetGUID: 009b218718b671e46b0f0cbcc02ac4c9
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    carConfig: {fileID: 11400000, guid: c79cb2b99050a8649a001f75c36206af, type: 2}
+  trackAssets:
+  - assetID: TRACK1
+    trackModel:
+      m_AssetGUID: 3576b457d461ca04b8e740ee5fa015a5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    trackData:
+      m_AssetGUID: 76baade1b1992f74cba370e9f7ef32bf
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - assetID: TRACK2
+    trackModel:
+      m_AssetGUID: f349b19d2a7749d42b82c9819d9ce885
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    trackData:
+      m_AssetGUID: 47c654c773ac1804592a3c3faf5b2e15
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
 --- !u!114 &3741821853206460172
 MonoBehaviour:
   m_ObjectHideFlags: 0

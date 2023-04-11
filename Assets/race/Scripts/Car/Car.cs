@@ -7,14 +7,29 @@ using UnityEngine.VFX;
 
 public class Car : MonoBehaviourValidated
 {
+    public struct InputData
+    {
+        public float steer;
+        public float accelerate;
+        public float brake;
+        public Vector2 camera;
+
+        public Vector2 drift;
+
+        public int gear;
+    }
+
+    [SerializeField, Child] public Wheel[] wheels;
+    [SerializeField, Self] public Rigidbody RB;
+
+    [SerializeField, Anywhere] public VisualEffect smokePrefab;
+
     [ReadOnly] public CarController controller;
     [ReadOnly] public CarTemplate template;
     [ReadOnly] public CarModel model;
     [ReadOnly] public CarConfig config;
 
-    [SerializeField, Anywhere] public VisualEffect smokePrefab;
-
-    [SerializeField, Self] public Rigidbody RB;
+    public InputData inputData;
 
     public bool automaticTransmission;
 
@@ -29,7 +44,7 @@ public class Car : MonoBehaviourValidated
 
         controller = carController;
         controller.car = this;
-        foreach (Wheel wheel in controller.wheels)
+        foreach (Wheel wheel in wheels)
         {
             wheel.transform.position = model.wheelPositions[(int)wheel.wheelType].position;
             wheel.transform.rotation = transform.rotation;
@@ -47,6 +62,20 @@ public class Car : MonoBehaviourValidated
         RB.rotation = checkpointCollider.transform.rotation;
     }
 
+    public float GetGearRatio()
+    {
+        float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
+        float forwardRatio = forwardComponent / config.topSpeed;
+        AnimationCurve gearCurve = config.motorTorqueResponseCurve[inputData.gear];
+
+        Keyframe first = gearCurve.keys.First(k => k.value >= 0);
+        Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
+
+        float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
+
+        return Mathf.Clamp01(inputData.gear == 0 ? 1 - rpmRatio : rpmRatio);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<CheckpointCollider>() is CheckpointCollider checkpoint)
@@ -55,27 +84,45 @@ public class Car : MonoBehaviourValidated
         }
     }
 
-    public float GetGearRatio()
-    {
-        float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
-        float forwardRatio = forwardComponent / config.topSpeed;
-        AnimationCurve gearCurve = config.motorTorqueResponseCurve[controller.inputData.gear];
-
-        Keyframe first = gearCurve.keys.First(k => k.value >= 0);
-        Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
-
-        float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
-
-        return Mathf.Clamp01(controller.inputData.gear == 0 ? 1 - rpmRatio : rpmRatio);
-    }
-
     private void Update()
     {
-        if (automaticTransmission && controller.inputData.gear > 0)
+        if (automaticTransmission && inputData.gear > 0)
         {
             float ratio = GetGearRatio();
-            if (controller.inputData.gear < config.motorTorqueResponseCurve.Count - 1 && ratio > config.automaticGearLimits.y) controller.inputData.gear++;
-            if (controller.inputData.gear > 1 && ratio < config.automaticGearLimits.x) controller.inputData.gear--;
+            if (inputData.gear < config.motorTorqueResponseCurve.Count - 1 && ratio > config.automaticGearLimits.y) inputData.gear++;
+            if (inputData.gear > 1 && ratio < config.automaticGearLimits.x) inputData.gear--;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        float gripFactor = 0;
+        float speedRatio = 0;
+        foreach (Wheel wheel in wheels)
+        {
+            Wheel.WheelData wheelData = wheel.CalculateWheelData();
+            gripFactor += wheelData.gripFactor;
+            speedRatio += wheelData.speedRatio;
+        }
+        gripFactor /= wheels.Length;
+        speedRatio /= wheels.Length;
+
+        float directionDot = Vector3.Dot(transform.forward, RB.velocity.normalized);
+        if (gripFactor < config.gripToDriftThreshold && inputData.drift.x <= 0)
+        {
+            inputData.drift.x = RB.velocity.magnitude;
+            inputData.drift.y = RB.velocity.magnitude;
+        }
+        if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f || directionDot > 0.995f)
+        {
+            inputData.drift.x = 0;
+            inputData.drift.y = 0;
+        }
+
+        if (inputData.drift.x > 0)
+        {
+            float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
+            RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
         }
     }
 }

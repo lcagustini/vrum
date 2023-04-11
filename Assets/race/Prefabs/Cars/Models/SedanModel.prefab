@@ -363,6 +363,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: sedanSports
       objectReference: {fileID: 0}
+    - target: {fileID: 6702464640330306029, guid: 583993376db5d1d4aa267e27c19e693c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: fe8546dceb7934247bf679ded607c303, type: 2}
+    - target: {fileID: 8449996119470504636, guid: 583993376db5d1d4aa267e27c19e693c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: fe8546dceb7934247bf679ded607c303, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
