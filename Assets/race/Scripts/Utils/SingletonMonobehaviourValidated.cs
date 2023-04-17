@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SingletonMonoBehaviourValidated<T> : MonoBehaviourValidated where T : SingletonMonoBehaviourValidated<T>
+public class SingletonMonoBehaviourValidated<T> : ValidatedMonoBehaviour where T : SingletonMonoBehaviourValidated<T>
 {
     public static T Instance;
 

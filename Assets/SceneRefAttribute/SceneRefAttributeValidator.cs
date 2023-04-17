@@ -270,6 +270,8 @@ namespace KBCore.Refs
                 case ScriptableObject valueSO:
                     ValidateRefLocation(loc, c, field, valueSO);
                     break;
+                default:
+                    throw new Exception($"{c.GetType().Name} has unexpected reference type {refObj.GetType().Name}");
             }
         }
 
@@ -315,7 +317,7 @@ namespace KBCore.Refs
                 case RefLoc.Self:
                 case RefLoc.Parent:
                 case RefLoc.Child:
-                    Debug.LogError($"{c.GetType().Name} requires {field.FieldType.Name} ref '{field.Name}' to be a Anywhere only", c.gameObject);
+                    Debug.LogError($"{c.GetType().Name} requires {field.FieldType.Name} ref '{field.Name}' to be Anywhere", c.gameObject);
                     break;
 
                 default:

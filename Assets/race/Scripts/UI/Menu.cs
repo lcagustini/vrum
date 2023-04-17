@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Menu : MonoBehaviourValidated
+public class Menu : ValidatedMonoBehaviour
 {
     [SerializeField, Anywhere] private RotateTransform carModelParent;
     [SerializeField, Anywhere] private RotateTransform trackModelParent;

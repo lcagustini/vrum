@@ -6,7 +6,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class HUD_Car : MonoBehaviourValidated
+public class HUD_Car : ValidatedMonoBehaviour
 {
     [SerializeField, Anywhere] private TextMeshProUGUI speed;
     [SerializeField, Anywhere] private TextMeshProUGUI gear;
@@ -15,6 +15,10 @@ public class HUD_Car : MonoBehaviourValidated
 
     [SerializeField, Anywhere] private TextMeshProUGUI bestTime;
     [SerializeField, Anywhere] private TextMeshProUGUI currentTime;
+
+    [SerializeField, Anywhere] private Slider acceleration;
+    [SerializeField, Anywhere] private Slider brake;
+    [SerializeField, Anywhere] private Slider steer;
 
     private Car car;
 
@@ -30,19 +34,21 @@ public class HUD_Car : MonoBehaviourValidated
     private void Update()
     {
         if (car == null) car = FindObjectOfType<Car>();
+        if (car == null) return;
 
-        if (car != null)
-        {
-            speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
-            gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
-            gearRatio.value = car.GetGearRatio();
+        speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
+        gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
+        gearRatio.value = car.GetGearRatio();
 
-            if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
-            else if (gearRatio.value > 0.75f) gearRatioImage.color = Color.yellow;
-            else gearRatioImage.color = Color.white;
+        if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
+        else if (gearRatio.value > 0.75f) gearRatioImage.color = Color.yellow;
+        else gearRatioImage.color = Color.white;
 
-            bestTime.text = FormatTime(LapManager.Instance.GetBestTime(car));
-            currentTime.text = FormatTime(LapManager.Instance.GetRunningTime(car));
-        }
+        bestTime.text = FormatTime(LapManager.Instance.GetBestTime(car));
+        currentTime.text = FormatTime(LapManager.Instance.GetRunningTime(car));
+
+        acceleration.value = car.inputData.accelerate;
+        brake.value = car.inputData.brake;
+        steer.value = (1 + car.inputData.steer) / 2;
     }
 }

@@ -69,9 +69,6 @@ public class Asset
 [System.Serializable]
 public class CarAsset : Asset
 {
-    public AssetReference car;
-    public AssetReference carTemplate;
-    public AssetReference carController;
     public AssetReference carModel;
     public CarConfig carConfig;
 }

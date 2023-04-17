@@ -18,52 +18,57 @@ MonoBehaviour:
   m_GUID: 1d572bb68895888498567704f7e38933
   m_SerializeEntries:
   - m_GUID: e021af36e721a334884f904084586bc8
-    m_Address: Assets/race/Prefabs/Cars/Car.prefab
+    m_Address: Car
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b21c39d6954d77942a5be2f8199cde21
-    m_Address: Assets/race/Prefabs/Cars/CarController.prefab
+    m_Address: CarController
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 009b218718b671e46b0f0cbcc02ac4c9
-    m_Address: Assets/race/Prefabs/Cars/CarModel.prefab
+    m_Address: CarModel
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9efedc66feda22a4cb485c9cb4d5df1a
-    m_Address: Assets/race/Prefabs/Cars/CarTemplate.prefab
+    m_Address: CarTemplate
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ee49688a06b2924e81680c9c2c0cc05
-    m_Address: Assets/race/Prefabs/Cars/SedanModel.prefab
+    m_Address: SedanModel
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e4235d6d998991542a550cba8d354188
-    m_Address: Assets/race/Prefabs/Cars/Models/LanderModel.prefab
+    m_Address: LanderModel
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 76baade1b1992f74cba370e9f7ef32bf
-    m_Address: Assets/race/Prefabs/Tracks/Track 1/Track 1 Data.prefab
+    m_Address: Track 1 Data
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3576b457d461ca04b8e740ee5fa015a5
-    m_Address: Assets/race/Prefabs/Tracks/Track 1/Track 1 Model.prefab
+    m_Address: Track 1 Model
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 47c654c773ac1804592a3c3faf5b2e15
-    m_Address: Assets/race/Prefabs/Tracks/Track 2/Track 2 Data.prefab
+    m_Address: Track 2 Data
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f349b19d2a7749d42b82c9819d9ce885
-    m_Address: Assets/race/Prefabs/Tracks/Track 2/Track 2 Model.prefab
+    m_Address: Track 2 Model
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c6689f3d62754c41b33d82237910cf3
+    m_Address: CarAI
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

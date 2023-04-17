@@ -3,7 +3,42 @@ guid: e22602c82b59ecb4aa617aed17b9e4c5
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: _defaultMat
+    second: {fileID: 2100000, guid: 62a5244796691124aa6724da8a20c0e5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: carTire
+    second: {fileID: 2100000, guid: 9e8c34d336f417747aa2234a9b35a7cc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lightBack
+    second: {fileID: 2100000, guid: fff1a2979d3357b47a5b65e534b0435e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lightFront
+    second: {fileID: 2100000, guid: 83552188338d2a043aadcdd4b849034e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: paintGreen
+    second: {fileID: 2100000, guid: a1796013a7e9b654abf536bfd1e22f20, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: plastic
+    second: {fileID: 2100000, guid: 4f329dd2c1479b34cb5eb2c8b1e0f7e3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: window
+    second: {fileID: 2100000, guid: 53f4916aaa580944b8a2a75d4216cdc5, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -70,7 +105,7 @@ ModelImporter:
     strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 3
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0

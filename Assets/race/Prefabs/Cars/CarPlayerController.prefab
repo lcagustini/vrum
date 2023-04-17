@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5772633823324160353}
-  - component: {fileID: 4215251984817902688}
+  - component: {fileID: 1002441012057437826}
   - component: {fileID: 6001781283105182479}
   m_Layer: 0
-  m_Name: CarController
+  m_Name: CarPlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4215251984817902688
+--- !u!114 &1002441012057437826
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5317595657315698730}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78be392ae46d0db40ba6c6868858f095, type: 3}
+  m_Script: {fileID: 11500000, guid: 6729f737be5a299468ca01b403a6402e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   car: {fileID: 0}
@@ -74,8 +74,8 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: Steer
         m_Mode: 0
         m_Arguments:
@@ -90,8 +90,8 @@ MonoBehaviour:
     m_ActionName: Gameplay/Steer[/XInputControllerWindows/leftStick/x]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: Accelerate
         m_Mode: 0
         m_Arguments:
@@ -106,8 +106,8 @@ MonoBehaviour:
     m_ActionName: Gameplay/Accelerate[/XInputControllerWindows/rightTrigger]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: Brake
         m_Mode: 0
         m_Arguments:
@@ -122,8 +122,8 @@ MonoBehaviour:
     m_ActionName: Gameplay/Brake[/XInputControllerWindows/leftTrigger]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: Camera
         m_Mode: 0
         m_Arguments:
@@ -138,8 +138,8 @@ MonoBehaviour:
     m_ActionName: Gameplay/Camera[/XInputControllerWindows/rightStick]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: GearUp
         m_Mode: 0
         m_Arguments:
@@ -154,8 +154,8 @@ MonoBehaviour:
     m_ActionName: Gameplay/Gear Up[/XInputControllerWindows/rightShoulder]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4215251984817902688}
-        m_TargetAssemblyTypeName: CarController, race
+      - m_Target: {fileID: 1002441012057437826}
+        m_TargetAssemblyTypeName: CarPlayerController, race
         m_MethodName: GearDown
         m_Mode: 0
         m_Arguments:

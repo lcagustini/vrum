@@ -5,8 +5,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.VFX;
 
-public class Car : MonoBehaviourValidated
+public class Car : ValidatedMonoBehaviour
 {
+    [System.Serializable]
     public struct InputData
     {
         public float steer;
@@ -14,7 +15,7 @@ public class Car : MonoBehaviourValidated
         public float brake;
         public Vector2 camera;
 
-        public Vector2 drift;
+        public float drift;
 
         public int gear;
     }
@@ -29,7 +30,7 @@ public class Car : MonoBehaviourValidated
     [ReadOnly] public CarModel model;
     [ReadOnly] public CarConfig config;
 
-    public InputData inputData;
+    [ReadOnly] public InputData inputData;
 
     public bool automaticTransmission;
 
@@ -44,6 +45,7 @@ public class Car : MonoBehaviourValidated
 
         controller = carController;
         controller.car = this;
+
         foreach (Wheel wheel in wheels)
         {
             wheel.transform.position = model.wheelPositions[(int)wheel.wheelType].position;
@@ -57,9 +59,9 @@ public class Car : MonoBehaviourValidated
 
         LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
 
-        CheckpointCollider checkpointCollider = LapManager.Instance.GetLastCollider();
-        RB.position = checkpointCollider.transform.position;
-        RB.rotation = checkpointCollider.transform.rotation;
+        StartingGridPoint gridPoint = LapManager.Instance.AllocateGridPoint();
+        RB.position = gridPoint.transform.position;
+        RB.rotation = gridPoint.transform.rotation;
     }
 
     public float GetGearRatio()
@@ -102,27 +104,27 @@ public class Car : MonoBehaviourValidated
         {
             Wheel.WheelData wheelData = wheel.CalculateWheelData();
             gripFactor += wheelData.gripFactor;
-            speedRatio += wheelData.speedRatio;
+            speedRatio += wheelData.topSpeedRatio;
         }
         gripFactor /= wheels.Length;
         speedRatio /= wheels.Length;
 
         float directionDot = Vector3.Dot(transform.forward, RB.velocity.normalized);
-        if (gripFactor < config.gripToDriftThreshold && inputData.drift.x <= 0)
+        if (gripFactor < config.gripToDriftThreshold && inputData.drift <= 0)
         {
-            inputData.drift.x = RB.velocity.magnitude;
-            inputData.drift.y = RB.velocity.magnitude;
+            inputData.drift = RB.velocity.magnitude;
         }
         if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f || directionDot > 0.995f)
         {
-            inputData.drift.x = 0;
-            inputData.drift.y = 0;
+            inputData.drift = 0;
         }
 
-        if (inputData.drift.x > 0)
+        if (inputData.drift > 0)
         {
             float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
+
+            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, config.driftAdjustSpeed * Time.fixedDeltaTime);
         }
     }
 }

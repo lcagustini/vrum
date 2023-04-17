@@ -823,6 +823,7 @@ MonoBehaviour:
   - {fileID: 1177366521685883032}
   - {fileID: 5351445203328631463}
   - {fileID: 2909499904404784162}
+  gridPoints: []
 --- !u!1 &6172497713175276100
 GameObject:
   m_ObjectHideFlags: 0

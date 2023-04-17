@@ -7,7 +7,12 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class AssetContainer : PersistentSingletonMonobehaviour<AssetContainer>
 {
+    public AssetReference carMain;
+    public AssetReference carTemplate;
+    public AssetReference carController;
+    public AssetReference carAI;
     public CarAsset[] carAssets;
+
     public TrackAsset[] trackAssets;
 
     private Dictionary<AssetReference, AsyncOperationHandle<Object>> handles = new Dictionary<AssetReference, AsyncOperationHandle<Object>>();

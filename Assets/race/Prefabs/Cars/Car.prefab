@@ -153,6 +153,13 @@ MonoBehaviour:
   template: {fileID: 0}
   model: {fileID: 0}
   config: {fileID: 0}
+  inputData:
+    steer: 0
+    accelerate: 0
+    brake: 0
+    camera: {x: 0, y: 0}
+    drift: 0
+    gear: 0
   automaticTransmission: 1
 --- !u!54 &-6977563941870641369
 Rigidbody:

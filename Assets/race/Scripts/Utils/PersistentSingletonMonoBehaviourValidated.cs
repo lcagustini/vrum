@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PersistentSingletonMonoBehaviourValidated<T> : MonoBehaviourValidated where T : PersistentSingletonMonoBehaviourValidated<T>
+public class PersistentSingletonMonoBehaviourValidated<T> : ValidatedMonoBehaviour where T : PersistentSingletonMonoBehaviourValidated<T>
 {
     public static T Instance;
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 {
@@ -25,16 +26,33 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
     }
 
     [SerializeField, Child] private CheckpointCollider[] checkpoints;
+    private int availableGridPoint;
+
+    [SerializeField, Child] private StartingGridPoint[] gridPoints;
     public Dictionary<Car, LapTracker> checkpointTracker = new Dictionary<Car, LapTracker>();
+
+    [SerializeField, Child] public SplineContainer racingLine;
 
     private void Start()
     {
         CheckpointCollider checkpoint = checkpoints.First(c => c.order == 0);
     }
 
-    public CheckpointCollider GetLastCollider()
+    public StartingGridPoint AllocateGridPoint()
     {
-        return checkpoints[checkpoints.Length - 1];
+        if (availableGridPoint >= gridPoints.Length) return null;
+
+        StartingGridPoint point = gridPoints[availableGridPoint];
+        availableGridPoint++;
+        return point;
+    }
+
+    public (CheckpointCollider, CheckpointCollider) GetNextTwoCheckpoints(Car car)
+    {
+        int maxOrder = checkpoints.Max(c => c.order);
+        int nextOrder = checkpointTracker[car].checkpoint >= maxOrder ? checkpointTracker[car].checkpoint - maxOrder : checkpointTracker[car].checkpoint + 1;
+        int nextNextOrder = (checkpointTracker[car].checkpoint + 1) >= maxOrder ? checkpointTracker[car].checkpoint + 1 - maxOrder : checkpointTracker[car].checkpoint + 2;
+        return (checkpoints.FirstOrDefault(c => c.order == nextOrder), checkpoints.FirstOrDefault(c => c.order == nextNextOrder));
     }
 
     public void UpdateCheckpoint(Car car, int order)

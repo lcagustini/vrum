@@ -12,17 +12,30 @@ public class RaceManager : MonoBehaviour
         CarAsset car = AssetContainer.Instance.carAssets.FirstOrDefault(a => a.assetID == SceneLoader.Instance.playData.carAssetID) ?? AssetContainer.Instance.carAssets[0];
 
         SpawnTrack(track);
-        SpawnCar(car);
+        SpawnAICar(car);
+        //SpawnPlayerCar(car);
     }
 
-    private async Task SpawnCar(CarAsset asset)
+    private async Task SpawnAICar(CarAsset asset)
     {
-        await AssetContainer.Instance.LoadAssets(new AssetReference[] { asset.car, asset.carController, asset.carModel, asset.carTemplate });
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carAI, asset.carModel, AssetContainer.Instance.carTemplate });
 
-        Car car = AssetContainer.Instance.Instantiate<Car>(asset.car);
+        Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
-        CarController controller = AssetContainer.Instance.Instantiate<CarController>(asset.carController, car.transform);
-        CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(asset.carTemplate, car.transform);
+        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carAI, car.transform);
+        CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(AssetContainer.Instance.carTemplate, car.transform);
+
+        car.Setup(controller, template, model, asset.carConfig);
+    }
+
+    private async Task SpawnPlayerCar(CarAsset asset)
+    {
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carController, asset.carModel, AssetContainer.Instance.carTemplate });
+
+        Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
+        CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
+        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carController, car.transform);
+        CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(AssetContainer.Instance.carTemplate, car.transform);
 
         car.Setup(controller, template, model, asset.carConfig);
     }

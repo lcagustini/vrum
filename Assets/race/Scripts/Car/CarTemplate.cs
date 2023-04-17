@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class CarTemplate : MonoBehaviourValidated
+public class CarTemplate : ValidatedMonoBehaviour
 {
     [SerializeField, Child] public CinemachineVirtualCamera virtualCamera;
 }

@@ -5,16 +5,17 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.VFX;
 
-public class Wheel : MonoBehaviourValidated
+public class Wheel : ValidatedMonoBehaviour
 {
     public struct WheelData
     {
         public Vector3 velocity;
         public float speed;
-        public float speedRatio;
+        public float topSpeedRatio;
 
         public float forwardComponent;
         public float forwardRatio;
+        public float topSpeedforwardRatio;
 
         public float sidewaysComponent;
         public float sidewaysRatio;
@@ -69,7 +70,7 @@ public class Wheel : MonoBehaviourValidated
     {
         if (IsMotorWheel)
         {
-            float motorTorqueFactor = car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * Mathf.Clamp(car.inputData.accelerate * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(wheelData.forwardRatio), -1.0f, 1.0f);
+            float motorTorqueFactor = car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * Mathf.Clamp(car.inputData.accelerate * car.config.motorTorqueResponseCurve[car.inputData.gear].Evaluate(wheelData.topSpeedforwardRatio), -1.0f, 1.0f);
             float motorTorque = motorTorqueFactor * car.config.motorMaxTorque;
 
             Vector3 forceVector = wheelData.gripFactor * motorTorque * transform.forward;
@@ -85,11 +86,19 @@ public class Wheel : MonoBehaviourValidated
 
     private Vector3 ApplyDriftForce(WheelData wheelData)
     {
-        float driftFactor = car.config.driftTorqueModifier * car.config.driftAccelerationFactorCurves[(int)wheelType].Evaluate((car.inputData.drift.y - wheelData.speed) / (car.inputData.drift.y + wheelData.speed));
+        float speedDiff = (1 - car.inputData.brake) * (car.inputData.drift - wheelData.speed) / car.config.topSpeed;
+        float driftFactor = car.inputData.drift > 0 ? Mathf.Clamp(100 * speedDiff, -1, 1) : 0;
         float driftTorque = driftFactor * car.config.motorMaxTorque;
 
+#if false
         Vector3 halfwayVector = (wheelData.velocity.normalized + transform.forward).normalized;
-        Vector3 forceVector = wheelData.gripFactor * driftTorque * halfwayVector;
+        halfwayVector = 2 * transform.forward * Vector3.Dot(transform.forward, halfwayVector) - halfwayVector;
+        Vector3 forceVector = driftTorque * halfwayVector;
+#else
+        float steer = car.config.driftSteerLimit * Vector3.Dot(wheelData.velocity.normalized, car.transform.forward) * Mathf.Abs(car.inputData.steer);
+        Vector3 halfwayVector = Vector3.Slerp(transform.forward, car.inputData.steer > 0 ? transform.right : -transform.right, steer);
+        Vector3 forceVector = driftTorque * halfwayVector;
+#endif
 
         Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
         car.RB.AddForceAtPosition(forceVector, transform.position);
@@ -99,7 +108,7 @@ public class Wheel : MonoBehaviourValidated
 
     private Vector3 ApplyBrakeForce(float input, WheelData wheelData)
     {
-        float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(wheelData.forwardRatio);
+        float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(wheelData.topSpeedforwardRatio);
         float brakeForce = -brakeFactor * wheelData.forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
 
         Vector3 forceVector = brakeForce * wheelData.gripFactor * transform.forward;
@@ -116,17 +125,18 @@ public class Wheel : MonoBehaviourValidated
 
         wheelData.velocity = car.RB.GetPointVelocity(transform.position);
         wheelData.speed = wheelData.velocity.magnitude;
-        wheelData.speedRatio = wheelData.speed / car.config.topSpeed;
+        wheelData.topSpeedRatio = wheelData.speed / car.config.topSpeed;
 
         wheelData.forwardComponent = Vector3.Dot(transform.forward, wheelData.velocity);
-        wheelData.forwardRatio = wheelData.forwardComponent / car.config.topSpeed;
+        wheelData.forwardRatio = wheelData.speed == 0 ? 0 : Mathf.Abs(wheelData.forwardComponent / wheelData.speed);
+        wheelData.topSpeedforwardRatio = wheelData.forwardComponent / car.config.topSpeed;
 
         wheelData.sidewaysComponent = Vector3.Dot(transform.right, wheelData.velocity);
         wheelData.sidewaysRatio = wheelData.speed == 0 ? 0 : Mathf.Abs(wheelData.sidewaysComponent / wheelData.speed);
 
         wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
 
-        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.speedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.brakeGripLossCurves[(int)wheelType].Evaluate(car.inputData.brake);
+        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.brakeGripLossCurves[(int)wheelType].Evaluate(car.inputData.brake);
 
         return wheelData;
     }
@@ -142,7 +152,7 @@ public class Wheel : MonoBehaviourValidated
 
         if (IsSteeringWheel)
         {
-            float turnAmountFactor = car.config.wheelForwardTurnModifier.Evaluate(wheelData.forwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(wheelData.sidewaysRatio);
+            float turnAmountFactor = car.config.wheelForwardTurnModifier.Evaluate(wheelData.topSpeedforwardRatio) + car.config.wheelSidewaysTurnModifier.Evaluate(wheelData.sidewaysRatio);
             float turnAmount = turnAmountFactor * car.config.wheelMaxTurnDegrees;
 
             transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
@@ -154,23 +164,11 @@ public class Wheel : MonoBehaviourValidated
 
             springLength = hitInfo.distance - car.config.wheelRadius;
 
-            Vector3 planarForce = Vector3.zero;
-
             ApplySuspensionForce(wheelData);
-            planarForce += ApplySteeringForce(wheelData);
-            planarForce += ApplyAccelerationForce(wheelData);
-            planarForce += ApplyBrakeForce(car.inputData.brake, wheelData);
+            ApplySteeringForce(wheelData);
+            ApplyAccelerationForce(wheelData);
+            ApplyBrakeForce(car.inputData.brake, wheelData);
             ApplyDriftForce(wheelData);
-
-            Vector3 velocityChange = planarForce * Time.fixedDeltaTime / car.RB.mass;
-            if (car.inputData.drift.x > 0)
-            {
-                float speedDiff = 2 * Mathf.Abs(car.inputData.drift.x - car.inputData.drift.y) / (car.inputData.drift.x + car.inputData.drift.y);
-                float speedDot = Vector3.Dot(velocityChange, transform.forward);
-                float negativeModifier = 1 - (speedDiff / car.config.driftSpeedDiffLimit.x);
-                float positiveModifier = 1 - (speedDiff / car.config.driftSpeedDiffLimit.y);
-                car.inputData.drift.y += (speedDot > 0 ? positiveModifier : negativeModifier) * speedDot;
-            }
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
         }
@@ -181,7 +179,7 @@ public class Wheel : MonoBehaviourValidated
             springLength = car.config.springMaxTravel;
         }
 
-        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < car.config.smokeThreshold) || car.inputData.drift.x > 0))
+        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < car.config.smokeThreshold) || car.inputData.drift > 0))
         {
             if (!isSmokePlaying)
             {
@@ -189,7 +187,7 @@ public class Wheel : MonoBehaviourValidated
                 isSmokePlaying = true;
             }
         }
-        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > car.config.smokeThreshold) && car.inputData.drift.x <= 0))
+        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > car.config.smokeThreshold) && car.inputData.drift <= 0))
         {
             if (isSmokePlaying)
             {
