@@ -80,13 +80,6 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
     carConfig: {fileID: 11400000, guid: d8848118fc4827140909fcc23b054dc1, type: 2}
-  - assetID: DRIFTY
-    carModel:
-      m_AssetGUID: 009b218718b671e46b0f0cbcc02ac4c9
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    carConfig: {fileID: 11400000, guid: c79cb2b99050a8649a001f75c36206af, type: 2}
   trackAssets:
   - assetID: TRACK1
     trackModel:

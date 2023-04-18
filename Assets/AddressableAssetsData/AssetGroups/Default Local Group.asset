@@ -27,11 +27,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 009b218718b671e46b0f0cbcc02ac4c9
-    m_Address: CarModel
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9efedc66feda22a4cb485c9cb4d5df1a
     m_Address: CarTemplate
     m_ReadOnly: 0

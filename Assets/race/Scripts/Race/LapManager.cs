@@ -33,6 +33,8 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
     [SerializeField, Child] public SplineContainer racingLine;
 
+    public bool HasGridPointAvailable => availableGridPoint < gridPoints.Length;
+
     private void Start()
     {
         CheckpointCollider checkpoint = checkpoints.First(c => c.order == 0);
@@ -45,14 +47,6 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
         StartingGridPoint point = gridPoints[availableGridPoint];
         availableGridPoint++;
         return point;
-    }
-
-    public (CheckpointCollider, CheckpointCollider) GetNextTwoCheckpoints(Car car)
-    {
-        int maxOrder = checkpoints.Max(c => c.order);
-        int nextOrder = checkpointTracker[car].checkpoint >= maxOrder ? checkpointTracker[car].checkpoint - maxOrder : checkpointTracker[car].checkpoint + 1;
-        int nextNextOrder = (checkpointTracker[car].checkpoint + 1) >= maxOrder ? checkpointTracker[car].checkpoint + 1 - maxOrder : checkpointTracker[car].checkpoint + 2;
-        return (checkpoints.FirstOrDefault(c => c.order == nextOrder), checkpoints.FirstOrDefault(c => c.order == nextNextOrder));
     }
 
     public void UpdateCheckpoint(Car car, int order)
@@ -71,6 +65,23 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
             Debug.Log($"Lap {checkpointTracker[car].lapTimes.Count}: {checkpointTracker[car].lapTimes[checkpointTracker[car].lapTimes.Count - 1]}");
         }
+    }
+
+    public int GetLap(Car car)
+    {
+        return checkpointTracker[car].lap;
+    }
+
+    public CheckpointCollider GetCheckpoint(Car car)
+    {
+        return checkpoints.FirstOrDefault(c => c.order == checkpointTracker[car].checkpoint);
+    }
+
+    public CheckpointCollider GetNextCheckpoint(Car car)
+    {
+        int maxOrder = checkpoints.Max(c => c.order);
+        int nextOrder = checkpointTracker[car].checkpoint >= maxOrder ? checkpointTracker[car].checkpoint - maxOrder : checkpointTracker[car].checkpoint + 1;
+        return checkpoints.FirstOrDefault(c => c.order == nextOrder);
     }
 
     public float GetRunningTime(Car car)

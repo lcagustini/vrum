@@ -20,6 +20,8 @@ public class HUD_Car : ValidatedMonoBehaviour
     [SerializeField, Anywhere] private Slider brake;
     [SerializeField, Anywhere] private Slider steer;
 
+    [SerializeField, Anywhere] private TextMeshProUGUI[] positions;
+
     private Car car;
 
     private string FormatTime(float time)
@@ -50,5 +52,17 @@ public class HUD_Car : ValidatedMonoBehaviour
         acceleration.value = car.inputData.accelerate;
         brake.value = car.inputData.brake;
         steer.value = (1 + car.inputData.steer) / 2;
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            if (i >= RaceManager.Instance.cars.Count)
+            {
+                positions[i].text = "";
+            }
+            else
+            {
+                positions[i].text = (i + 1) + ": " + RaceManager.Instance.cars[i].name;
+            }
+        }
     }
 }

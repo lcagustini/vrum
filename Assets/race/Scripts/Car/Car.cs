@@ -54,8 +54,11 @@ public class Car : ValidatedMonoBehaviour
         }
 
         template = carTemplate;
-        template.virtualCamera.Follow = transform;
-        template.virtualCamera.LookAt = transform;
+        if (template != null)
+        {
+            template.virtualCamera.Follow = transform;
+            template.virtualCamera.LookAt = transform;
+        }
 
         LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
 
