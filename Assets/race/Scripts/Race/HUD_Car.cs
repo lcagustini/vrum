@@ -15,6 +15,10 @@ public class HUD_Car : ValidatedMonoBehaviour
 
     [SerializeField, Anywhere] private TextMeshProUGUI bestTime;
     [SerializeField, Anywhere] private TextMeshProUGUI currentTime;
+    [SerializeField, Anywhere] private TextMeshProUGUI lap;
+
+    [SerializeField, Anywhere] private RectTransform raceStarting;
+    [SerializeField, Anywhere] private RectTransform raceEnded;
 
     [SerializeField, Anywhere] private Slider acceleration;
     [SerializeField, Anywhere] private Slider brake;
@@ -35,7 +39,7 @@ public class HUD_Car : ValidatedMonoBehaviour
 
     private void Update()
     {
-        if (car == null) car = FindObjectOfType<Car>();
+        if (car == null && RaceManager.Instance.racingCars.Count > 0) car = RaceManager.Instance.racingCars[0];
         if (car == null) return;
 
         speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
@@ -55,14 +59,35 @@ public class HUD_Car : ValidatedMonoBehaviour
 
         for (int i = 0; i < positions.Length; i++)
         {
-            if (i >= RaceManager.Instance.cars.Count)
+            if (i >= RaceManager.Instance.racingCars.Count)
             {
                 positions[i].text = "";
             }
             else
             {
-                positions[i].text = (i + 1) + ": " + RaceManager.Instance.cars[i].name;
+                positions[i].text = (i + 1) + ": " + RaceManager.Instance.racingCars[i].name;
             }
+        }
+
+        if (RaceManager.Instance.RaceRunning)
+        {
+            raceEnded.gameObject.SetActive(false);
+            raceStarting.gameObject.SetActive(false);
+            lap.text = LapManager.Instance.GetLap(car) + " / " + LapManager.Instance.totalLaps;
+        }
+        else
+        {
+            if (RaceManager.Instance.RaceStarting)
+            {
+                raceEnded.gameObject.SetActive(false);
+                raceStarting.gameObject.SetActive(true);
+            }
+            else
+            {
+                raceStarting.gameObject.SetActive(false);
+                raceEnded.gameObject.SetActive(true);
+            }
+            lap.text = "";
         }
     }
 }

@@ -11,8 +11,6 @@ public class CarAIController : CarController
 
     private void Update()
     {
-        if (car.inputData.gear == 0) car.inputData.gear = 1;
-
         bool drifting = car.inputData.drift > 0;
 
         Vector3 followPoint = LapManager.Instance.racingLine.EvaluatePosition(followParameter);

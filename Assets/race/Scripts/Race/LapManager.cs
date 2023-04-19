@@ -33,6 +33,8 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
     [SerializeField, Child] public SplineContainer racingLine;
 
+    [SerializeField] public int totalLaps;
+
     public bool HasGridPointAvailable => availableGridPoint < gridPoints.Length;
 
     private void Start()
@@ -51,6 +53,8 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
     public void UpdateCheckpoint(Car car, int order)
     {
+        if (checkpointTracker[car].lap == totalLaps + 1) return;
+
         if (order == checkpointTracker[car].checkpoint + 1)
         {
             checkpointTracker[car].checkpoint = order;
@@ -64,6 +68,13 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
             checkpointTracker[car].currentLapStartTime = Time.timeSinceLevelLoad;
 
             Debug.Log($"Lap {checkpointTracker[car].lapTimes.Count}: {checkpointTracker[car].lapTimes[checkpointTracker[car].lapTimes.Count - 1]}");
+        }
+
+        if (checkpointTracker[car].lap == totalLaps + 1)
+        {
+            RaceManager.Instance.firstRacingCar++;
+
+            Debug.Log("Finished race");
         }
     }
 

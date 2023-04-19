@@ -41,6 +41,8 @@ public class Car : ValidatedMonoBehaviour
         RB.mass = config.carMass;
         RB.centerOfMass = config.centerOfMass;
 
+        inputData.gear = 1;
+
         model = carModel;
 
         controller = carController;
@@ -103,11 +105,13 @@ public class Car : ValidatedMonoBehaviour
     {
         float gripFactor = 0;
         float speedRatio = 0;
+        bool grounded = false;
         foreach (Wheel wheel in wheels)
         {
             Wheel.WheelData wheelData = wheel.CalculateWheelData();
             gripFactor += wheelData.gripFactor;
             speedRatio += wheelData.topSpeedRatio;
+            grounded |= wheel.Grounded;
         }
         gripFactor /= wheels.Length;
         speedRatio /= wheels.Length;
@@ -129,5 +133,8 @@ public class Car : ValidatedMonoBehaviour
 
             inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, config.driftAdjustSpeed * Time.fixedDeltaTime);
         }
+
+        RB.drag = grounded ? 0 : 0.6f;
+        RB.angularDrag = grounded ? 0.05f : 0.5f;
     }
 }

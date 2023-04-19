@@ -33,7 +33,7 @@ public class Wheel : ValidatedMonoBehaviour
     [SerializeField] public WheelType wheelType;
 
     private float springLength;
-    private bool grounded;
+    public bool Grounded { get; private set; }
 
     public Vector3 WheelPosition => transform.position + (springLength * -transform.up);
     public Vector3 GroundPoint => transform.position + ((springLength + car.config.wheelRadius) * -transform.up);
@@ -137,6 +137,7 @@ public class Wheel : ValidatedMonoBehaviour
         wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
 
         wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.brakeGripLossCurves[(int)wheelType].Evaluate(car.inputData.brake);
+        if (wheelData.speed < 2) wheelData.gripFactor = Mathf.Clamp01(10 * wheelData.gripFactor);
 
         return wheelData;
     }
@@ -160,26 +161,29 @@ public class Wheel : ValidatedMonoBehaviour
 
         if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius, LayerMask.GetMask("GroundCollider")))
         {
-            grounded = true;
+            Grounded = true;
 
             springLength = hitInfo.distance - car.config.wheelRadius;
 
-            ApplySuspensionForce(wheelData);
-            ApplySteeringForce(wheelData);
-            ApplyAccelerationForce(wheelData);
-            ApplyBrakeForce(car.inputData.brake, wheelData);
-            ApplyDriftForce(wheelData);
+            if (!RaceManager.Instance.RaceStarting)
+            {
+                ApplySuspensionForce(wheelData);
+                ApplySteeringForce(wheelData);
+                ApplyAccelerationForce(wheelData);
+                ApplyBrakeForce(car.inputData.brake, wheelData);
+                ApplyDriftForce(wheelData);
+            }
 
             if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
         }
         else
         {
-            grounded = false;
+            Grounded = false;
 
             springLength = car.config.springMaxTravel;
         }
 
-        if (grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < car.config.smokeThreshold) || car.inputData.drift > 0))
+        if (Grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < car.config.smokeThreshold) || car.inputData.drift > 0))
         {
             if (!isSmokePlaying)
             {
@@ -187,7 +191,7 @@ public class Wheel : ValidatedMonoBehaviour
                 isSmokePlaying = true;
             }
         }
-        if (!grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > car.config.smokeThreshold) && car.inputData.drift <= 0))
+        if (!Grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > car.config.smokeThreshold) && car.inputData.drift <= 0))
         {
             if (isSmokePlaying)
             {
