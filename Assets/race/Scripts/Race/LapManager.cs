@@ -74,6 +74,11 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
         {
             RaceManager.Instance.firstRacingCar++;
 
+            if (car.controller is CarPlayerController)
+            {
+                RaceManager.Instance.ConvertPlayerCarToAI(car);
+            }
+
             Debug.Log("Finished race");
         }
     }

@@ -77,7 +77,8 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
         CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carAI, car.transform);
 
-        car.Setup(controller, null, model, asset.carConfig);
+        car.CarSetup(controller, null, model, asset.carConfig);
+        car.RaceSetup();
 
         return car;
     }
@@ -91,9 +92,19 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carController, car.transform);
         CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(AssetContainer.Instance.carTemplate, car.transform);
 
-        car.Setup(controller, template, model, asset.carConfig);
+        car.CarSetup(controller, template, model, asset.carConfig);
+        car.RaceSetup();
 
         return car;
+    }
+
+    public void ConvertPlayerCarToAI(Car car)
+    {
+        Destroy(car.controller.gameObject);
+
+        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carAI, car.transform);
+
+        car.CarSetup(controller, car.template, car.model, car.config);
     }
 
     private async Task SpawnTrack(TrackAsset asset)

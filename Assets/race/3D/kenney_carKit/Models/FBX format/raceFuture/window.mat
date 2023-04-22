@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: plastic
+  m_Name: window
   m_Shader: {fileID: -6465566751694194690, guid: 2753d56cee62e1e4c815b7d92a3a0328,
     type: 3}
   m_Parent: {fileID: 0}
@@ -15,6 +15,7 @@ Material:
   m_ValidKeywords:
   - _AL_QUANTIZATION_TYPE_COLOR_COUNT
   - _ML_QUANTIZATION_TYPE_RAMP_TEXTURE
+  - _SPECULAR_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -140,8 +141,8 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _SPECULAR: 0
-    - _Smoothness: 0
+    - _SPECULAR: 1
+    - _Smoothness: 0.7
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -153,14 +154,14 @@ Material:
     - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _BaseColor: {r: 0.6472208, g: 0.6472208, b: 0.6472208, a: 1}
-    - _Color: {r: 0.6472208, g: 0.6472208, b: 0.6472208, a: 1}
-    - _DiffuseColor: {r: 0.64705884, g: 0.64705884, b: 0.64705884, a: 1}
+    - _BaseColor: {r: 0.9718961, g: 0.9718961, b: 0.9718961, a: 1}
+    - _Color: {r: 0.9718961, g: 0.9718961, b: 0.9718961, a: 1}
+    - _DiffuseColor: {r: 0.972549, g: 0.972549, b: 0.972549, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Emissive_Color: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &6438597064848720626
+--- !u!114 &759528286479512371
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

@@ -111,9 +111,10 @@ public class Wheel : ValidatedMonoBehaviour
         float brakeFactor = input * car.config.brakeResponseCurve.Evaluate(wheelData.topSpeedforwardRatio);
         float brakeForce = -brakeFactor * wheelData.forwardComponent * car.config.wheelMass / Time.fixedDeltaTime;
 
-        Vector3 forceVector = brakeForce * wheelData.gripFactor * transform.forward;
+        float gripFactor = car.inputData.drift > 0 ? 1 : wheelData.gripFactor;
+        Vector3 forceVector = brakeForce * gripFactor * transform.forward;
 
-        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
+        Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.red);
         car.RB.AddForceAtPosition(forceVector, transform.position);
 
         return forceVector;
@@ -165,9 +166,9 @@ public class Wheel : ValidatedMonoBehaviour
 
             springLength = hitInfo.distance - car.config.wheelRadius;
 
+            ApplySuspensionForce(wheelData);
             if (!RaceManager.Instance.RaceStarting)
             {
-                ApplySuspensionForce(wheelData);
                 ApplySteeringForce(wheelData);
                 ApplyAccelerationForce(wheelData);
                 ApplyBrakeForce(car.inputData.brake, wheelData);

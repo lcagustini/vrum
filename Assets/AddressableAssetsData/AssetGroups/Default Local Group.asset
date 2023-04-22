@@ -67,6 +67,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c329a094b6fa27488778c5abb1c1ca0
+    m_Address: Assets/race/Prefabs/Cars/Models/RacerModel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fa1c57dd01d19f94cb05621c98021009, type: 2}
   m_SchemaSet:

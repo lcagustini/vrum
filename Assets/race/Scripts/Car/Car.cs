@@ -34,7 +34,7 @@ public class Car : ValidatedMonoBehaviour
 
     public bool automaticTransmission;
 
-    public void Setup(CarController carController, CarTemplate carTemplate, CarModel carModel, CarConfig carConfig)
+    public void CarSetup(CarController carController, CarTemplate carTemplate, CarModel carModel, CarConfig carConfig)
     {
         config = carConfig;
 
@@ -61,7 +61,10 @@ public class Car : ValidatedMonoBehaviour
             template.virtualCamera.Follow = transform;
             template.virtualCamera.LookAt = transform;
         }
+    }
 
+    public void RaceSetup()
+    {
         LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
 
         StartingGridPoint gridPoint = LapManager.Instance.AllocateGridPoint();
@@ -131,7 +134,7 @@ public class Car : ValidatedMonoBehaviour
             float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
 
-            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, config.driftAdjustSpeed * Time.fixedDeltaTime);
+            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, (1 + inputData.brake) * config.driftAdjustSpeed * Time.fixedDeltaTime);
         }
 
         RB.drag = grounded ? 0 : 0.6f;
