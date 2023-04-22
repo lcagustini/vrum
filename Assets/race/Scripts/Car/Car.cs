@@ -124,7 +124,7 @@ public class Car : ValidatedMonoBehaviour
         {
             inputData.drift = RB.velocity.magnitude;
         }
-        if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f || directionDot > 0.995f)
+        else if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f)
         {
             inputData.drift = 0;
         }
@@ -134,7 +134,8 @@ public class Car : ValidatedMonoBehaviour
             float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
 
-            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, (1 + inputData.brake) * config.driftAdjustSpeed * Time.fixedDeltaTime);
+            float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
+            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, adjustScale * config.driftAdjustSpeed * Time.fixedDeltaTime);
         }
 
         RB.drag = grounded ? 0 : 0.6f;

@@ -184,7 +184,7 @@ public class Wheel : ValidatedMonoBehaviour
             springLength = car.config.springMaxTravel;
         }
 
-        if (Grounded && ((car.inputData.accelerate > 0.5f && wheelData.gripFactor < car.config.smokeThreshold) || car.inputData.drift > 0))
+        if (Grounded && car.inputData.drift > 0)
         {
             if (!isSmokePlaying)
             {
@@ -192,7 +192,7 @@ public class Wheel : ValidatedMonoBehaviour
                 isSmokePlaying = true;
             }
         }
-        if (!Grounded || ((car.inputData.accelerate < 0.1f || wheelData.gripFactor > car.config.smokeThreshold) && car.inputData.drift <= 0))
+        else
         {
             if (isSmokePlaying)
             {

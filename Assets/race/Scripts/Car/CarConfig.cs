@@ -50,7 +50,6 @@ public class CarConfig : ScriptableObject
     public float driftSteerLimit;
     public float driftCarAngleModifier;
     public float gripToDriftThreshold;
-    public float smokeThreshold;
     public AnimationCurve driftRotationScaling;
 
     public List<AnimationCurve> sidewaysGripFactorCurves;
