@@ -52,6 +52,14 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         racingCars = new List<Car>();
         firstRacingCar = 0;
 
+#if AI_TEST
+        for (int i = 0; i < 20; i++)
+        {
+            CarAsset car = AssetContainer.Instance.carAssets[0];
+            racingCars.Add(await SpawnMLCar(car));
+            racingCars[racingCars.Count - 1].name = "ML " + racingCars.Count;
+        }
+#else
         CarAsset car = AssetContainer.Instance.carAssets.FirstOrDefault(a => a.assetID == SceneLoader.Instance.playData.carAssetID) ?? AssetContainer.Instance.carAssets[0];
         racingCars.Add(await SpawnPlayerCar(car));
         racingCars[racingCars.Count - 1].name = "Player";
@@ -64,9 +72,24 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         }
 
         await Task.Delay(5000);
+#endif
 
         RaceStarting = false;
         RaceRunning = true;
+    }
+
+    private async Task<Car> SpawnMLCar(CarAsset asset)
+    {
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carML, asset.carModel, AssetContainer.Instance.carTemplate });
+
+        Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
+        CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
+        ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carML, car.transform);
+
+        car.CarSetup(controller, null, model, asset.carConfig);
+        car.RaceSetup();
+
+        return car;
     }
 
     private async Task<Car> SpawnAICar(CarAsset asset)
@@ -75,7 +98,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
         Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
-        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carAI, car.transform);
+        ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
         car.CarSetup(controller, null, model, asset.carConfig);
         car.RaceSetup();
@@ -89,7 +112,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
         Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
-        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carController, car.transform);
+        ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carController, car.transform);
         CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(AssetContainer.Instance.carTemplate, car.transform);
 
         car.CarSetup(controller, template, model, asset.carConfig);
@@ -100,9 +123,9 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
     public void ConvertPlayerCarToAI(Car car)
     {
-        Destroy(car.controller.gameObject);
+        Destroy(car.controller.GameObject);
 
-        CarController controller = AssetContainer.Instance.Instantiate<CarController>(AssetContainer.Instance.carAI, car.transform);
+        ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
         car.CarSetup(controller, car.template, car.model, car.config);
     }

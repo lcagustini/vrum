@@ -25,10 +25,19 @@ public class Wheel : ValidatedMonoBehaviour
         public float gripFactor;
     }
 
+    public enum GroundType
+    {
+        Dirt,
+        Road
+    }
+
     [SerializeField, Parent] private Car car;
 
     private VisualEffect driftSmoke;
     private bool isSmokePlaying;
+
+    private VisualEffect driftDirt;
+    private bool isDirtPlaying;
 
     [SerializeField] public WheelType wheelType;
 
@@ -40,6 +49,8 @@ public class Wheel : ValidatedMonoBehaviour
 
     private bool IsMotorWheel => ((wheelType == WheelType.BackLeft || wheelType == WheelType.BackRight) && (car.config.drivetrain == Drivetrain.RearWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive)) || ((wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight) && (car.config.drivetrain == Drivetrain.FrontWheelDrive || car.config.drivetrain == Drivetrain.AllWheelDrive));
     private bool IsSteeringWheel => wheelType == WheelType.FrontLeft || wheelType == WheelType.FrontRight;
+
+    public GroundType groundType;
 
     private Vector3 ApplySuspensionForce(WheelData wheelData)
     {
@@ -143,9 +154,10 @@ public class Wheel : ValidatedMonoBehaviour
         return wheelData;
     }
 
-    public void SetupSmoke(VisualEffect smokePrefab)
+    public void SetupParticles(VisualEffect smokePrefab, VisualEffect dirtPrefab)
     {
         driftSmoke = Instantiate(smokePrefab, transform);
+        driftDirt = Instantiate(dirtPrefab, transform);
     }
 
     private void FixedUpdate()
@@ -160,8 +172,24 @@ public class Wheel : ValidatedMonoBehaviour
             transform.localRotation = Quaternion.Euler(0, turnAmount * car.inputData.steer, 0);
         }
 
-        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius, LayerMask.GetMask("GroundCollider")))
+        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit hitInfo, car.config.springMaxTravel + car.config.wheelRadius, LayerMask.GetMask("DirtCollider", "RoadCollider")))
         {
+            switch (LayerMask.LayerToName(hitInfo.collider.gameObject.layer))
+            {
+                case "DirtCollider":
+                    groundType = GroundType.Dirt;
+                    break;
+                case "RoadCollider":
+                    groundType = GroundType.Road;
+                    break;
+            }
+
+            if (groundType == GroundType.Dirt)
+            {
+                wheelData.gripFactor *= 0.6f;
+                ApplyBrakeForce(0.01f, wheelData);
+            }
+
             Grounded = true;
 
             springLength = hitInfo.distance - car.config.wheelRadius;
@@ -186,18 +214,42 @@ public class Wheel : ValidatedMonoBehaviour
 
         if (Grounded && car.inputData.drift > 0)
         {
-            if (!isSmokePlaying)
+            switch (groundType)
             {
-                driftSmoke.Play();
-                isSmokePlaying = true;
+                case GroundType.Dirt:
+                    if (!isDirtPlaying)
+                    {
+                        driftDirt.Play();
+                        isDirtPlaying = true;
+                    }
+                    if (isSmokePlaying)
+                    {
+                        driftSmoke.Stop();
+                        isSmokePlaying = false;
+                    }
+                    break;
+                case GroundType.Road:
+                    if (!isSmokePlaying)
+                    {
+                        driftSmoke.Play();
+                        isSmokePlaying = true;
+                    }
+                    if (isDirtPlaying)
+                    {
+                        driftDirt.Stop();
+                        isDirtPlaying = false;
+                    }
+                    break;
             }
         }
         else
         {
-            if (isSmokePlaying)
+            if (isSmokePlaying || isDirtPlaying)
             {
                 driftSmoke.Stop();
+                driftDirt.Stop();
                 isSmokePlaying = false;
+                isDirtPlaying = false;
             }
         }
     }
@@ -208,6 +260,7 @@ public class Wheel : ValidatedMonoBehaviour
         car.model.wheelVisuals[(int)wheelType].transform.rotation = Quaternion.RotateTowards(car.model.wheelVisuals[(int)wheelType].transform.rotation, transform.rotation, 90 * Time.deltaTime);
 
         driftSmoke.transform.position = GroundPoint;
+        driftDirt.transform.position = GroundPoint;
     }
 
 #if UNITY_EDITOR

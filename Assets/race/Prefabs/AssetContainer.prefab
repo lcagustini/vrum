@@ -65,6 +65,11 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  carML:
+    m_AssetGUID: 9575cdfb30296df44bacb3a32a09235c
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   carAssets:
   - assetID: RACER
     carModel:
@@ -73,16 +78,16 @@ MonoBehaviour:
       m_SubObjectType: 
       m_EditorAssetChanged: 0
     carConfig: {fileID: 11400000, guid: 8fb591bb6d0268a4b8ef943989cd54db, type: 2}
-  - assetID: LANDER
+  - assetID: SEDAN
     carModel:
-      m_AssetGUID: e4235d6d998991542a550cba8d354188
+      m_AssetGUID: 3ee49688a06b2924e81680c9c2c0cc05
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
     carConfig: {fileID: 11400000, guid: d8848118fc4827140909fcc23b054dc1, type: 2}
-  - assetID: SEDAN
+  - assetID: LANDER
     carModel:
-      m_AssetGUID: 3ee49688a06b2924e81680c9c2c0cc05
+      m_AssetGUID: e4235d6d998991542a550cba8d354188
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0

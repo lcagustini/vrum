@@ -11,6 +11,7 @@ public class AssetContainer : PersistentSingletonMonobehaviour<AssetContainer>
     public AssetReference carTemplate;
     public AssetReference carController;
     public AssetReference carAI;
+    public AssetReference carML;
     public CarAsset[] carAssets;
 
     public TrackAsset[] trackAssets;
@@ -29,13 +30,13 @@ public class AssetContainer : PersistentSingletonMonobehaviour<AssetContainer>
         return Instantiate(prefab, parent);
     }
 
-    public T Instantiate<T>(AssetReference asset) where T : Component
+    public T Instantiate<T>(AssetReference asset)
     {
         GameObject prefab = GetLoadedAsset(asset);
         return Instantiate(prefab).GetComponent<T>();
     }
 
-    public T Instantiate<T>(AssetReference asset, Transform parent) where T : Component
+    public T Instantiate<T>(AssetReference asset, Transform parent)
     {
         GameObject prefab = GetLoadedAsset(asset);
         return Instantiate(prefab, parent).GetComponent<T>();

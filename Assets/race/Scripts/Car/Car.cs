@@ -24,17 +24,20 @@ public class Car : ValidatedMonoBehaviour
     [SerializeField, Self] public Rigidbody RB;
 
     [SerializeField, Anywhere] public VisualEffect smokePrefab;
+    [SerializeField, Anywhere] public VisualEffect dirtPrefab;
 
-    [ReadOnly] public CarController controller;
+    [ReadOnly] public ICarController controller;
     [ReadOnly] public CarTemplate template;
     [ReadOnly] public CarModel model;
     [ReadOnly] public CarConfig config;
+
+    [ReadOnly] public StartingGridPoint gridPoint;
 
     [ReadOnly] public InputData inputData;
 
     public bool automaticTransmission;
 
-    public void CarSetup(CarController carController, CarTemplate carTemplate, CarModel carModel, CarConfig carConfig)
+    public void CarSetup(ICarController carController, CarTemplate carTemplate, CarModel carModel, CarConfig carConfig)
     {
         config = carConfig;
 
@@ -46,13 +49,13 @@ public class Car : ValidatedMonoBehaviour
         model = carModel;
 
         controller = carController;
-        controller.car = this;
+        controller.Car = this;
 
         foreach (Wheel wheel in wheels)
         {
             wheel.transform.position = model.wheelPositions[(int)wheel.wheelType].position;
             wheel.transform.rotation = transform.rotation;
-            wheel.SetupSmoke(smokePrefab);
+            wheel.SetupParticles(smokePrefab, dirtPrefab);
         }
 
         template = carTemplate;
@@ -67,7 +70,7 @@ public class Car : ValidatedMonoBehaviour
     {
         LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
 
-        StartingGridPoint gridPoint = LapManager.Instance.AllocateGridPoint();
+        gridPoint = LapManager.Instance.AllocateGridPoint();
         RB.position = gridPoint.transform.position;
         RB.rotation = gridPoint.transform.rotation;
     }

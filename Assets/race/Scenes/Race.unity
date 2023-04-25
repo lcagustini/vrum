@@ -1547,7 +1547,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   racingCars: []
   firstRacingCar: 0
-  raceRunning: 0
 --- !u!4 &585069569
 Transform:
   m_ObjectHideFlags: 0

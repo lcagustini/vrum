@@ -5,7 +5,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public abstract class CarController : ValidatedMonoBehaviour
+public interface ICarController
 {
-    [ReadOnly] public Car car;
+    GameObject GameObject { get; }
+    Car Car { get; set; }
 }

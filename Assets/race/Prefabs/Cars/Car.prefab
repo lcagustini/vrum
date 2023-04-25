@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car: {fileID: 5756930423485767516}
   wheelType: 1
+  groundType: 0
 --- !u!1 &5563599690628016840
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,6 +93,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car: {fileID: 5756930423485767516}
   wheelType: 0
+  groundType: 0
 --- !u!1 &7117845695335047551
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,10 +151,12 @@ MonoBehaviour:
   RB: {fileID: -6977563941870641369}
   smokePrefab: {fileID: 7191149238001858617, guid: a54cdf1fbcc35254bb86ad5a52930371,
     type: 3}
-  controller: {fileID: 0}
+  dirtPrefab: {fileID: 7191149238001858617, guid: 6c6f551cca130eb4fa49f16a9948b1e2,
+    type: 3}
   template: {fileID: 0}
   model: {fileID: 0}
   config: {fileID: 0}
+  gridPoint: {fileID: 0}
   inputData:
     steer: 0
     accelerate: 0
@@ -234,6 +238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car: {fileID: 5756930423485767516}
   wheelType: 3
+  groundType: 0
 --- !u!1 &9112026456492106225
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,3 +285,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   car: {fileID: 5756930423485767516}
   wheelType: 2
+  groundType: 0

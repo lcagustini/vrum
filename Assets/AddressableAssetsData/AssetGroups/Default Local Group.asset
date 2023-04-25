@@ -52,16 +52,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 47c654c773ac1804592a3c3faf5b2e15
-    m_Address: Track 2 Data
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f349b19d2a7749d42b82c9819d9ce885
-    m_Address: Track 2 Model
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2c6689f3d62754c41b33d82237910cf3
     m_Address: CarAI
     m_ReadOnly: 0
@@ -69,6 +59,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1c329a094b6fa27488778c5abb1c1ca0
     m_Address: Assets/race/Prefabs/Cars/Models/RacerModel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9575cdfb30296df44bacb3a32a09235c
+    m_Address: Assets/race/Prefabs/Cars/CarMLController.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
