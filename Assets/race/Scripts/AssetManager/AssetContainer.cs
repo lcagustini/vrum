@@ -8,7 +8,6 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class AssetContainer : PersistentSingletonMonobehaviour<AssetContainer>
 {
     public AssetReference carMain;
-    public AssetReference carTemplate;
     public AssetReference carController;
     public AssetReference carAI;
     public AssetReference carML;

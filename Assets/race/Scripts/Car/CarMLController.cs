@@ -5,12 +5,14 @@ using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using Cinemachine;
 
 public class CarMLController : Agent, ICarController
 {
     private float followParameter;
     private float checkpoint;
 
+    public CinemachineVirtualCamera VirtualCamera => null;
     public GameObject GameObject => gameObject;
     public Car Car { get; set; }
 
@@ -88,7 +90,7 @@ public class CarMLController : Agent, ICarController
 
         Debug.DrawLine(Car.transform.position, followPoint, Color.cyan);
 
-        float checkDistance = (1 + Car.RB.velocity.magnitude / Car.config.topSpeed) * (followDot > 0 ? 30 : 60);
+        float checkDistance = (1 + Car.RB.velocity.magnitude / Car.config.TopSpeed(Car)) * (followDot > 0 ? 30 : 60);
         if (followDir.magnitude < checkDistance)
         {
             followParameter += 0.004f;

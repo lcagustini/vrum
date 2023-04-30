@@ -23,7 +23,10 @@ public class CarConfig : ScriptableObject
     public float carMass;
     public Vector3 centerOfMass;
 
-    public float topSpeed;
+    public float TopSpeed(Car car) => (car.inputData.slipstream ? slipstreamModifier : 1) * (car.automaticTransmission ? automaticTopSpeed : manualTopSpeed);
+    public float manualTopSpeed;
+    public float automaticTopSpeed;
+    public float slipstreamModifier;
     public Drivetrain drivetrain;
 
     public Vector2 automaticGearLimits;

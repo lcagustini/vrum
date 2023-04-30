@@ -80,13 +80,13 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
     private async Task<Car> SpawnMLCar(CarAsset asset)
     {
-        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carML, asset.carModel, AssetContainer.Instance.carTemplate });
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carML, asset.carModel });
 
         Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carML, car.transform);
 
-        car.CarSetup(controller, null, model, asset.carConfig);
+        car.CarSetup(controller, model, asset.carConfig);
         car.RaceSetup();
 
         return car;
@@ -94,13 +94,13 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
     private async Task<Car> SpawnAICar(CarAsset asset)
     {
-        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carAI, asset.carModel, AssetContainer.Instance.carTemplate });
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carAI, asset.carModel });
 
         Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
-        car.CarSetup(controller, null, model, asset.carConfig);
+        car.CarSetup(controller, model, asset.carConfig);
         car.RaceSetup();
 
         return car;
@@ -108,14 +108,13 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
     private async Task<Car> SpawnPlayerCar(CarAsset asset)
     {
-        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carController, asset.carModel, AssetContainer.Instance.carTemplate });
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carMain, AssetContainer.Instance.carController, asset.carModel });
 
         Car car = AssetContainer.Instance.Instantiate<Car>(AssetContainer.Instance.carMain);
         CarModel model = AssetContainer.Instance.Instantiate<CarModel>(asset.carModel, car.transform);
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carController, car.transform);
-        CarTemplate template = AssetContainer.Instance.Instantiate<CarTemplate>(AssetContainer.Instance.carTemplate, car.transform);
 
-        car.CarSetup(controller, template, model, asset.carConfig);
+        car.CarSetup(controller, model, asset.carConfig);
         car.RaceSetup();
 
         return car;
@@ -127,7 +126,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
 
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
-        car.CarSetup(controller, car.template, car.model, car.config);
+        car.CarSetup(controller, car.model, car.config);
     }
 
     private async Task SpawnTrack(TrackAsset asset)

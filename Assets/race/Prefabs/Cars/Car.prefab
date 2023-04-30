@@ -47,6 +47,59 @@ MonoBehaviour:
   car: {fileID: 5756930423485767516}
   wheelType: 1
   groundType: 0
+--- !u!1 &3495430164044497474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 804846858970050384}
+  - component: {fileID: 1533125453212884290}
+  m_Layer: 8
+  m_Name: SlipstreamArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &804846858970050384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3495430164044497474}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.841, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 204007434255094497}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1533125453212884290
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3495430164044497474}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.012817, y: 1.0456619, z: 11.277674}
+  m_Center: {x: 0, y: 0, z: -6.4842424}
 --- !u!1 &5563599690628016840
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,6 +181,7 @@ Transform:
   - {fileID: 6947775447006281743}
   - {fileID: 2443907554723362543}
   - {fileID: 773391475766243576}
+  - {fileID: 804846858970050384}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -153,7 +207,8 @@ MonoBehaviour:
     type: 3}
   dirtPrefab: {fileID: 7191149238001858617, guid: 6c6f551cca130eb4fa49f16a9948b1e2,
     type: 3}
-  template: {fileID: 0}
+  slipstreamPrefab: {fileID: 7191149238001858617, guid: dc06211e364fcab41a9d86d4539f9e2d,
+    type: 3}
   model: {fileID: 0}
   config: {fileID: 0}
   gridPoint: {fileID: 0}
@@ -163,6 +218,7 @@ MonoBehaviour:
     brake: 0
     camera: {x: 0, y: 0}
     drift: 0
+    slipstream: 0
     gear: 0
   automaticTransmission: 1
 --- !u!54 &-6977563941870641369

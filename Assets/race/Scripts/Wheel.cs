@@ -97,7 +97,7 @@ public class Wheel : ValidatedMonoBehaviour
 
     private Vector3 ApplyDriftForce(WheelData wheelData)
     {
-        float speedDiff = (1 - car.inputData.brake) * (car.inputData.drift - wheelData.speed) / car.config.topSpeed;
+        float speedDiff = (1 - car.inputData.brake) * (car.inputData.drift - wheelData.speed) / car.config.TopSpeed(car);
         float driftFactor = car.inputData.drift > 0 ? Mathf.Clamp(100 * speedDiff, -1, 1) : 0;
         float driftTorque = driftFactor * car.config.motorMaxTorque;
 
@@ -137,11 +137,11 @@ public class Wheel : ValidatedMonoBehaviour
 
         wheelData.velocity = car.RB.GetPointVelocity(transform.position);
         wheelData.speed = wheelData.velocity.magnitude;
-        wheelData.topSpeedRatio = wheelData.speed / car.config.topSpeed;
+        wheelData.topSpeedRatio = wheelData.speed / car.config.TopSpeed(car);
 
         wheelData.forwardComponent = Vector3.Dot(transform.forward, wheelData.velocity);
         wheelData.forwardRatio = wheelData.speed == 0 ? 0 : Mathf.Abs(wheelData.forwardComponent / wheelData.speed);
-        wheelData.topSpeedforwardRatio = wheelData.forwardComponent / car.config.topSpeed;
+        wheelData.topSpeedforwardRatio = wheelData.forwardComponent / car.config.TopSpeed(car);
 
         wheelData.sidewaysComponent = Vector3.Dot(transform.right, wheelData.velocity);
         wheelData.sidewaysRatio = wheelData.speed == 0 ? 0 : Mathf.Abs(wheelData.sidewaysComponent / wheelData.speed);
@@ -156,8 +156,8 @@ public class Wheel : ValidatedMonoBehaviour
 
     public void SetupParticles(VisualEffect smokePrefab, VisualEffect dirtPrefab)
     {
-        driftSmoke = Instantiate(smokePrefab, transform);
-        driftDirt = Instantiate(dirtPrefab, transform);
+        if (driftSmoke == null) driftSmoke = Instantiate(smokePrefab, transform);
+        if (driftDirt == null) driftDirt = Instantiate(dirtPrefab, transform);
     }
 
     private void FixedUpdate()

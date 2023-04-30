@@ -19,6 +19,7 @@ public class HUD_Car : ValidatedMonoBehaviour
 
     [SerializeField, Anywhere] private RectTransform raceStarting;
     [SerializeField, Anywhere] private RectTransform raceEnded;
+    [SerializeField, Anywhere] private RectTransform wrongWay;
 
     [SerializeField, Anywhere] private Slider acceleration;
     [SerializeField, Anywhere] private Slider brake;
@@ -89,5 +90,8 @@ public class HUD_Car : ValidatedMonoBehaviour
             }
             lap.text = "";
         }
+
+        //wrongWay.gameObject.SetActive(Vector3.Dot(car.transform.forward, (LapManager.Instance.GetCheckpoint(car).transform.position - car.transform.position).normalized) >= 0.5f);
+        wrongWay.gameObject.SetActive(false);
     }
 }

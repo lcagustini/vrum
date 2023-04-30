@@ -16,6 +16,7 @@ public class Car : ValidatedMonoBehaviour
         public Vector2 camera;
 
         public float drift;
+        public bool slipstream;
 
         public int gear;
     }
@@ -25,9 +26,9 @@ public class Car : ValidatedMonoBehaviour
 
     [SerializeField, Anywhere] public VisualEffect smokePrefab;
     [SerializeField, Anywhere] public VisualEffect dirtPrefab;
+    [SerializeField, Anywhere] public VisualEffect slipstreamPrefab;
 
     [ReadOnly] public ICarController controller;
-    [ReadOnly] public CarTemplate template;
     [ReadOnly] public CarModel model;
     [ReadOnly] public CarConfig config;
 
@@ -37,7 +38,9 @@ public class Car : ValidatedMonoBehaviour
 
     public bool automaticTransmission;
 
-    public void CarSetup(ICarController carController, CarTemplate carTemplate, CarModel carModel, CarConfig carConfig)
+    private VisualEffect slipstreamEffect;
+
+    public void CarSetup(ICarController carController, CarModel carModel, CarConfig carConfig)
     {
         config = carConfig;
 
@@ -50,6 +53,11 @@ public class Car : ValidatedMonoBehaviour
 
         controller = carController;
         controller.Car = this;
+        if (controller.VirtualCamera != null)
+        {
+            controller.VirtualCamera.Follow = transform;
+            controller.VirtualCamera.LookAt = transform;
+        }
 
         foreach (Wheel wheel in wheels)
         {
@@ -58,12 +66,7 @@ public class Car : ValidatedMonoBehaviour
             wheel.SetupParticles(smokePrefab, dirtPrefab);
         }
 
-        template = carTemplate;
-        if (template != null)
-        {
-            template.virtualCamera.Follow = transform;
-            template.virtualCamera.LookAt = transform;
-        }
+        if (slipstreamEffect == null) slipstreamEffect = Instantiate(slipstreamPrefab, transform);
     }
 
     public void RaceSetup()
@@ -78,7 +81,7 @@ public class Car : ValidatedMonoBehaviour
     public float GetGearRatio()
     {
         float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
-        float forwardRatio = forwardComponent / config.topSpeed;
+        float forwardRatio = forwardComponent / config.TopSpeed(this);
         AnimationCurve gearCurve = config.motorTorqueResponseCurve[inputData.gear];
 
         Keyframe first = gearCurve.keys.First(k => k.value >= 0);
@@ -94,6 +97,21 @@ public class Car : ValidatedMonoBehaviour
         if (other.GetComponent<CheckpointCollider>() is CheckpointCollider checkpoint)
         {
             LapManager.Instance.UpdateCheckpoint(this, checkpoint.order);
+        }
+
+        if (!inputData.slipstream && other.gameObject.layer == LayerMask.NameToLayer("SlipstreamArea"))
+        {
+            inputData.slipstream = true;
+            slipstreamEffect.Play();
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (inputData.slipstream && other.gameObject.layer == LayerMask.NameToLayer("SlipstreamArea"))
+        {
+            inputData.slipstream = false;
+            slipstreamEffect.Stop();
         }
     }
 
@@ -122,10 +140,12 @@ public class Car : ValidatedMonoBehaviour
         gripFactor /= wheels.Length;
         speedRatio /= wheels.Length;
 
+        float speed = RB.velocity.magnitude;
+
         float directionDot = Vector3.Dot(transform.forward, RB.velocity.normalized);
         if (gripFactor < config.gripToDriftThreshold && inputData.drift <= 0)
         {
-            inputData.drift = RB.velocity.magnitude;
+            inputData.drift = speed;
         }
         else if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f)
         {
@@ -138,7 +158,7 @@ public class Car : ValidatedMonoBehaviour
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
 
             float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
-            inputData.drift = Mathf.Lerp(inputData.drift, RB.velocity.magnitude, adjustScale * config.driftAdjustSpeed * Time.fixedDeltaTime);
+            inputData.drift = Mathf.Lerp(inputData.drift, speed, adjustScale * config.driftAdjustSpeed * Time.fixedDeltaTime);
         }
 
         RB.drag = grounded ? 0 : 0.6f;

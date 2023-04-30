@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KBCore.Refs;
+using Cinemachine;
 
 public class CarAIController : MonoBehaviour, ICarController
 {
     private float followParameter;
 
+    public CinemachineVirtualCamera VirtualCamera => null;
     public GameObject GameObject => gameObject;
     public Car Car { get; set; }
 
@@ -28,11 +30,11 @@ public class CarAIController : MonoBehaviour, ICarController
         float directionMultiplier = (sideToBrake * sideToFollow < 0) ? 0 : 1;
         float driftMultiplier = drifting ? 0 : 1;
 
-        Car.inputData.accelerate = driftMultiplier * directionMultiplier * Mathf.Clamp01(3 * (Car.config.topSpeed - Car.RB.velocity.magnitude) / Car.config.topSpeed);
+        Car.inputData.accelerate = driftMultiplier * directionMultiplier * Mathf.Clamp01(3 * (Car.config.TopSpeed(Car) - Car.RB.velocity.magnitude) / Car.config.TopSpeed(Car));
         Car.inputData.steer = Mathf.Clamp(3f * sideToFollow, -1, 1);
         Car.inputData.brake = driftMultiplier * (Mathf.Clamp01(3 * Mathf.Abs(sideToBrake) - 1) + Mathf.Clamp01(4 * Mathf.Abs(sideToFollow) - 1)) / 2;
 
-        float checkDistance = (1 + Car.RB.velocity.magnitude / Car.config.topSpeed) * (drifting ? 40 : 30);
+        float checkDistance = (1 + Car.RB.velocity.magnitude / Car.config.TopSpeed(Car)) * (drifting ? 40 : 30);
         if (followDir.magnitude < checkDistance)
         {
             followParameter += 0.004f;

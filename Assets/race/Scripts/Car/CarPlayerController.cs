@@ -1,12 +1,17 @@
+using Cinemachine;
+using KBCore.Refs;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
-public class CarPlayerController : MonoBehaviour, ICarController
+public class CarPlayerController : ValidatedMonoBehaviour, ICarController
 {
+    public CinemachineVirtualCamera VirtualCamera => virtualCamera;
     public GameObject GameObject => gameObject;
     public Car Car { get; set; }
+
+    [SerializeField, Child] public CinemachineVirtualCamera virtualCamera;
 
     public void Steer(CallbackContext context)
     {

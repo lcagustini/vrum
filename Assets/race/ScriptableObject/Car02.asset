@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carMass: 1500
   centerOfMass: {x: 0, y: -0.36, z: 0}
-  topSpeed: 90
+  manualTopSpeed: 90
+  automaticTopSpeed: 90
+  slipstreamModifier: 1.1
   drivetrain: 0
   automaticGearLimits: {x: 0.4, y: 0.9}
   motorTorqueResponseCurve:
@@ -588,7 +590,6 @@ MonoBehaviour:
   driftSteerLimit: 0.3
   driftCarAngleModifier: 90
   gripToDriftThreshold: 0.65
-  smokeThreshold: 0.7
   driftRotationScaling:
     serializedVersion: 2
     m_Curve:
