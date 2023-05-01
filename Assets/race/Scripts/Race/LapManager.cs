@@ -102,12 +102,13 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
     public float GetRunningTime(Car car)
     {
+        if (!checkpointTracker.ContainsKey(car)) return 0;
         return Time.timeSinceLevelLoad - checkpointTracker[car].currentLapStartTime;
     }
 
     public float GetBestTime(Car car)
     {
-        if (checkpointTracker[car].lapTimes.Count == 0) return 0;
+        if (!checkpointTracker.ContainsKey(car) || checkpointTracker[car].lapTimes.Count == 0) return 0;
         return checkpointTracker[car].lapTimes.Min();
     }
 }

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carMass: 1500
   centerOfMass: {x: 0, y: -0.36, z: 0}
-  manualTopSpeed: 90
-  automaticTopSpeed: 90
+  manualTopSpeed: 100
+  automaticTopSpeed: 100
   slipstreamModifier: 1.1
   drivetrain: 0
   automaticGearLimits: {x: 0.4, y: 0.9}

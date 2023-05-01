@@ -74,6 +74,11 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         await Task.Delay(5000);
 #endif
 
+        foreach (Car racingCar in racingCars)
+        {
+            LapManager.Instance.checkpointTracker.Add(racingCar, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
+        }
+
         RaceStarting = false;
         RaceRunning = true;
     }
@@ -87,7 +92,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carML, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
-        car.RaceSetup();
+        car.PlaceInStartingGrid();
 
         return car;
     }
@@ -101,7 +106,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
-        car.RaceSetup();
+        car.PlaceInStartingGrid();
 
         return car;
     }
@@ -115,7 +120,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carController, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
-        car.RaceSetup();
+        car.PlaceInStartingGrid();
 
         return car;
     }

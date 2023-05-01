@@ -28,6 +28,8 @@ public class Car : ValidatedMonoBehaviour
     [SerializeField, Anywhere] public VisualEffect dirtPrefab;
     [SerializeField, Anywhere] public VisualEffect slipstreamPrefab;
 
+    [SerializeField, Child] public BoxCollider slipstreamCollider;
+
     [ReadOnly] public ICarController controller;
     [ReadOnly] public CarModel model;
     [ReadOnly] public CarConfig config;
@@ -39,6 +41,13 @@ public class Car : ValidatedMonoBehaviour
     public bool automaticTransmission;
 
     private VisualEffect slipstreamEffect;
+
+    private float slipstreamColliderOriginalSize;
+
+    private void Start()
+    {
+        slipstreamColliderOriginalSize = slipstreamCollider.size.z;
+    }
 
     public void CarSetup(ICarController carController, CarModel carModel, CarConfig carConfig)
     {
@@ -69,10 +78,8 @@ public class Car : ValidatedMonoBehaviour
         if (slipstreamEffect == null) slipstreamEffect = Instantiate(slipstreamPrefab, transform);
     }
 
-    public void RaceSetup()
+    public void PlaceInStartingGrid()
     {
-        LapManager.Instance.checkpointTracker.Add(this, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
-
         gridPoint = LapManager.Instance.AllocateGridPoint();
         RB.position = gridPoint.transform.position;
         RB.rotation = gridPoint.transform.rotation;
@@ -163,5 +170,8 @@ public class Car : ValidatedMonoBehaviour
 
         RB.drag = grounded ? 0 : 0.6f;
         RB.angularDrag = grounded ? 0.05f : 0.5f;
+
+        slipstreamCollider.size = new Vector3(slipstreamCollider.size.x, slipstreamCollider.size.y, slipstreamColliderOriginalSize * speed / config.TopSpeed(this));
+        slipstreamCollider.center = new Vector3(0, 0, (slipstreamColliderOriginalSize - slipstreamCollider.size.z) / 2);
     }
 }
