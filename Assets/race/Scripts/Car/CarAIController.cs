@@ -13,14 +13,6 @@ public class CarAIController : MonoBehaviour, ICarController
     public GameObject GameObject => gameObject;
     public Car Car { get; set; }
 
-    public float Sigmoid(float value)
-    {
-        Debug.Log($"{Car} {value}");
-        value = 5 * value;
-        float k = Mathf.Exp(value);
-        return k / (1.0f + k);
-    }
-
     private void Update()
     {
         bool drifting = Car.inputData.drift > 0;
@@ -40,9 +32,8 @@ public class CarAIController : MonoBehaviour, ICarController
         Car.inputData.accelerate = driftMultiplier * Mathf.Clamp01(3 * (Car.config.TopSpeed(Car) - Car.RB.velocity.magnitude) / Car.config.TopSpeed(Car));
         Car.inputData.steer = Mathf.Clamp(3f * sideToFollow, -1, 1);
         Car.inputData.brake = driftMultiplier * (Mathf.Clamp01(3 * Mathf.Abs(sideToBrake) - 1) + Mathf.Clamp01(4 * Mathf.Abs(sideToFollow) - 1)) / 2;
-        //Car.inputData.brake = driftMultiplier * Sigmoid(-75 * Vector3.Dot((followPoint - Car.transform.position).normalized, (brakePoint - Car.transform.position).normalized) + 74);
 
-        if (Car.inputData.brake > 0.8f) Car.inputData.accelerate = 0;
+        if (Car.inputData.brake > 0.8f && Car.RB.velocity.magnitude > 10) Car.inputData.accelerate = 0;
 
         float checkDistance = (1 + Car.RB.velocity.magnitude / Car.config.TopSpeed(Car)) * (drifting ? 40 : 30);
         if (followDir.magnitude < checkDistance)

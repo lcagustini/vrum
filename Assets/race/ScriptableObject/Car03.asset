@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carMass: 1500
   centerOfMass: {x: 0, y: -0.36, z: 0}
-  manualTopSpeed: 100
-  automaticTopSpeed: 100
+  manualTopSpeed: 90
+  automaticTopSpeed: 90
   slipstreamModifier: 1.1
   drivetrain: 0
   automaticGearLimits: {x: 0.4, y: 0.9}
@@ -300,135 +300,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  brakeGripLossCurves:
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.85
-      value: 1
-      inSlope: 0.02379115
-      outSlope: 0.02379115
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 1
-      value: 0.7
-      inSlope: -5.2927237
-      outSlope: -5.2927237
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.10683773
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.85
-      value: 1
-      inSlope: 0.02379115
-      outSlope: 0.02379115
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 1
-      value: 0.7
-      inSlope: -5.2927237
-      outSlope: -5.2927237
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.10683773
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.85
-      value: 1
-      inSlope: 0.02379115
-      outSlope: 0.02379115
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 1
-      value: 0.7
-      inSlope: -5.2927237
-      outSlope: -5.2927237
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.10683773
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.85
-      value: 1
-      inSlope: 0.02379115
-      outSlope: 0.02379115
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 1
-      value: 0.7
-      inSlope: -5.2927237
-      outSlope: -5.2927237
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.10683773
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   wheelRadius: 0.5
   wheelMass: 30
   wheelSidewaysTurnModifier:
@@ -488,7 +359,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  wheelMaxTurnDegrees: 6
+  wheelMaxTurnDegrees: 5
   springMaxTravel: 1
   springRestDistance: 0.65
   springStrength: 900000
@@ -586,9 +457,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  driftAdjustSpeed: 10
-  driftSteerLimit: 0.5
-  gripToDriftThreshold: 0.65
+  driftAdjustSpeed: 5
+  driftSteerLimit: 0.3
   sidewaysGripFactorCurves:
   - serializedVersion: 2
     m_Curve:

@@ -300,135 +300,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  brakeGripLossCurves:
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.8
-      value: 1
-      inSlope: 0
-      outSlope: 0.009119583
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.56738114
-    - serializedVersion: 3
-      time: 1
-      value: 0.5
-      inSlope: -6.438615
-      outSlope: -6.438615
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.04308075
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.8
-      value: 1
-      inSlope: 0
-      outSlope: 0.009119583
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.56738114
-    - serializedVersion: 3
-      time: 1
-      value: 0.5
-      inSlope: -6.438615
-      outSlope: -6.438615
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.04308075
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.8
-      value: 1
-      inSlope: 0
-      outSlope: 0.009119583
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.56738114
-    - serializedVersion: 3
-      time: 1
-      value: 0.5
-      inSlope: -6.438615
-      outSlope: -6.438615
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.04308075
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  - serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.8
-      value: 1
-      inSlope: 0
-      outSlope: 0.009119583
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.56738114
-    - serializedVersion: 3
-      time: 1
-      value: 0.5
-      inSlope: -6.438615
-      outSlope: -6.438615
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.04308075
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   wheelRadius: 0.5
   wheelMass: 30
   wheelSidewaysTurnModifier:
@@ -586,9 +457,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  driftAdjustSpeed: 10
+  driftAdjustSpeed: 5
   driftSteerLimit: 0.3
-  gripToDriftThreshold: 0.65
   sidewaysGripFactorCurves:
   - serializedVersion: 2
     m_Curve:

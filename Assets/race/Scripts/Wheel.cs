@@ -148,8 +148,8 @@ public class Wheel : ValidatedMonoBehaviour
 
         wheelData.upComponent = Vector3.Dot(transform.up, wheelData.velocity);
 
-        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * car.config.brakeGripLossCurves[(int)wheelType].Evaluate(car.inputData.brake);
-        if (wheelData.speed < 2) wheelData.gripFactor = Mathf.Clamp01(10 * wheelData.gripFactor);
+        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio);
+        if (wheelData.speed < 3) wheelData.gripFactor = Mathf.Clamp01(10 * wheelData.gripFactor);
 
         return wheelData;
     }

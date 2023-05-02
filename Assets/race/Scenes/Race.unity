@@ -4945,12 +4945,12 @@ PrefabInstance:
     - target: {fileID: 5719000698710001744, guid: 89b36546b9176624f9ddbe14978ac838,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5719000698710001744, guid: 89b36546b9176624f9ddbe14978ac838,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 168.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5719000698710001744, guid: 89b36546b9176624f9ddbe14978ac838,
         type: 3}

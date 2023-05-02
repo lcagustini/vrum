@@ -34,7 +34,6 @@ public class CarConfig : ScriptableObject
     public float motorMaxTorque;
 
     public AnimationCurve brakeResponseCurve;
-    public List<AnimationCurve> brakeGripLossCurves;
 
     public float wheelRadius;
     public float wheelMass;
@@ -49,9 +48,7 @@ public class CarConfig : ScriptableObject
     public float dampingStrength;
 
     public List<AnimationCurve> steeringAccelerationFactorCurves;
-    public float driftAdjustSpeed;
     public float driftSteerLimit;
-    public float gripToDriftThreshold;
 
     public List<AnimationCurve> sidewaysGripFactorCurves;
     public List<AnimationCurve> speedGripFactorCurves;

@@ -91,7 +91,6 @@ public class HUD_Car : ValidatedMonoBehaviour
             lap.text = "";
         }
 
-        //wrongWay.gameObject.SetActive(Vector3.Dot(car.transform.forward, (LapManager.Instance.GetCheckpoint(car).transform.position - car.transform.position).normalized) >= 0.5f);
         wrongWay.gameObject.SetActive(false);
     }
 }

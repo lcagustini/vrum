@@ -164,7 +164,7 @@ public class Car : ValidatedMonoBehaviour
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * 120 * Mathf.Clamp01(directionDot) * Time.fixedDeltaTime, transform.up);
 
             float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
-            inputData.drift = Mathf.Lerp(inputData.drift, speed, adjustScale * config.driftAdjustSpeed * Time.fixedDeltaTime);
+            inputData.drift = Mathf.Lerp(inputData.drift, speed, adjustScale * Time.fixedDeltaTime);
         }
 
         RB.drag = grounded ? 0 : 0.6f;
