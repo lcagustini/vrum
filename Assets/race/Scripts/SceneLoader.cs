@@ -17,9 +17,11 @@ public class SceneLoader : PersistentSingletonMonobehaviour<SceneLoader>
     public async void LoadScene(string name, int delay = -1)
     {
         if (delay > 0) await Task.Delay(delay);
+        destroyCancellationToken.ThrowIfCancellationRequested();
 
         AsyncOperation op = SceneManager.LoadSceneAsync(name);
 
         while (!op.isDone) await Task.Delay(100);
+        destroyCancellationToken.ThrowIfCancellationRequested();
     }
 }

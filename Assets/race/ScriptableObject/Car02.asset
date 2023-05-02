@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carMass: 1500
   centerOfMass: {x: 0, y: -0.36, z: 0}
-  manualTopSpeed: 90
-  automaticTopSpeed: 90
+  manualTopSpeed: 80
+  automaticTopSpeed: 80
   slipstreamModifier: 1.1
   drivetrain: 0
   automaticGearLimits: {x: 0.4, y: 0.9}
@@ -588,32 +588,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   driftAdjustSpeed: 10
   driftSteerLimit: 0.3
-  driftCarAngleModifier: 90
   gripToDriftThreshold: 0.65
-  driftRotationScaling:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0.031641293
-      outSlope: 0.031641293
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.22008546
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 2.9595623
-      outSlope: 2.9595623
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.02635336
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   sidewaysGripFactorCurves:
   - serializedVersion: 2
     m_Curve:

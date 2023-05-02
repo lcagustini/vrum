@@ -187,7 +187,7 @@ public class Wheel : ValidatedMonoBehaviour
             if (groundType == GroundType.Dirt)
             {
                 wheelData.gripFactor *= 0.6f;
-                ApplyBrakeForce(0.01f, wheelData);
+                ApplyBrakeForce(0.1f, wheelData);
             }
 
             Grounded = true;

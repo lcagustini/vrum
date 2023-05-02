@@ -125,8 +125,10 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         return car;
     }
 
-    public void ConvertPlayerCarToAI(Car car)
+    public async void ConvertPlayerCarToAI(Car car)
     {
+        await AssetContainer.Instance.LoadAssets(new AssetReference[] { AssetContainer.Instance.carAI });
+
         Destroy(car.controller.GameObject);
 
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);

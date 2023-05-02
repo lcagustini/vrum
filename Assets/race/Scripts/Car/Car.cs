@@ -150,19 +150,18 @@ public class Car : ValidatedMonoBehaviour
         float speed = RB.velocity.magnitude;
 
         float directionDot = Vector3.Dot(transform.forward, RB.velocity.normalized);
-        if (gripFactor < config.gripToDriftThreshold && inputData.drift <= 0)
+        if (inputData.accelerate < 0.01f && inputData.brake > 0.99f && Mathf.Abs(inputData.steer) > 0.9f && inputData.drift <= 0)
         {
             inputData.drift = speed;
         }
-        else if (gripFactor >= config.gripToDriftThreshold || speedRatio < 0.35f)
+        else if ((Vector3.Dot(RB.velocity, transform.forward) > 0.99f && Mathf.Abs(inputData.steer) < 0.1f) || speedRatio < 0.35f)
         {
             inputData.drift = 0;
         }
 
         if (inputData.drift > 0)
         {
-            float angleCos = config.driftRotationScaling.Evaluate(Mathf.Clamp01(directionDot));
-            RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngleModifier * angleCos * Time.fixedDeltaTime, transform.up);
+            RB.rotation *= Quaternion.AngleAxis(inputData.steer * 120 * Mathf.Clamp01(directionDot) * Time.fixedDeltaTime, transform.up);
 
             float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
             inputData.drift = Mathf.Lerp(inputData.drift, speed, adjustScale * config.driftAdjustSpeed * Time.fixedDeltaTime);
