@@ -17,6 +17,7 @@ public class Car : ValidatedMonoBehaviour
 
         public float drift;
         public bool slipstream;
+        public float rocketStart;
 
         public int gear;
     }
@@ -56,8 +57,6 @@ public class Car : ValidatedMonoBehaviour
         RB.mass = config.carMass;
         RB.centerOfMass = config.centerOfMass;
 
-        inputData.gear = 1;
-
         model = carModel;
 
         controller = carController;
@@ -87,16 +86,23 @@ public class Car : ValidatedMonoBehaviour
 
     public float GetGearRatio()
     {
-        float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
-        float forwardRatio = forwardComponent / config.TopSpeed(this);
-        AnimationCurve gearCurve = config.motorTorqueResponseCurve[inputData.gear];
+        if (inputData.gear == 0)
+        {
+            return inputData.accelerate;
+        }
+        else
+        {
+            float forwardComponent = Vector3.Dot(transform.forward, RB.velocity);
+            float forwardRatio = forwardComponent / config.TopSpeed(this);
+            AnimationCurve gearCurve = config.motorTorqueResponseCurve[inputData.gear + 1];
 
-        Keyframe first = gearCurve.keys.First(k => k.value >= 0);
-        Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
+            Keyframe first = gearCurve.keys.First(k => k.value >= 0);
+            Keyframe last = gearCurve.keys.Last(k => k.value >= 0);
 
-        float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
+            float rpmRatio = (forwardRatio - first.time) / (last.time - first.time);
 
-        return Mathf.Clamp01(inputData.gear == 0 ? 1 - rpmRatio : rpmRatio);
+            return Mathf.Clamp01(inputData.gear == -1 ? 1 - rpmRatio : rpmRatio);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -124,12 +130,20 @@ public class Car : ValidatedMonoBehaviour
 
     private void Update()
     {
-        if (automaticTransmission && inputData.gear > 0)
+        if (!RaceManager.Instance.RaceStarting && automaticTransmission && inputData.gear > 0)
         {
             float ratio = GetGearRatio();
-            if (inputData.gear < config.motorTorqueResponseCurve.Count - 1 && ratio > config.automaticGearLimits.y) inputData.gear++;
+            if (inputData.gear < config.motorTorqueResponseCurve.Count - 2 && ratio > config.automaticGearLimits.y) inputData.gear++;
             if (inputData.gear > 1 && ratio < config.automaticGearLimits.x) inputData.gear--;
         }
+
+        if (RaceManager.Instance.RaceRunning && inputData.rocketStart > 0)
+        {
+            inputData.rocketStart -= Time.deltaTime;
+            if (inputData.rocketStart < 0) inputData.rocketStart = 0;
+        }
+
+        Debug.Log(GetGearRatio());
     }
 
     private void FixedUpdate()
@@ -164,7 +178,7 @@ public class Car : ValidatedMonoBehaviour
             RB.rotation *= Quaternion.AngleAxis(inputData.steer * 120 * Mathf.Clamp01(directionDot) * Time.fixedDeltaTime, transform.up);
 
             float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
-            inputData.drift = Mathf.Lerp(inputData.drift, speed, adjustScale * Time.fixedDeltaTime);
+            inputData.drift = Mathf.Lerp(inputData.drift, speed, 4 * adjustScale * Time.fixedDeltaTime);
         }
 
         RB.drag = grounded ? 0 : 0.6f;

@@ -37,7 +37,7 @@ public class CarPlayerController : ValidatedMonoBehaviour, ICarController
     {
         if (context.performed)
         {
-            if (Car.inputData.gear < Car.config.motorTorqueResponseCurve.Count - 1) Car.inputData.gear++;
+            if (RaceManager.Instance.RaceRunning && Car.inputData.gear < Car.config.motorTorqueResponseCurve.Count - 2) Car.inputData.gear++;
         }
     }
 
@@ -45,7 +45,7 @@ public class CarPlayerController : ValidatedMonoBehaviour, ICarController
     {
         if (context.performed)
         {
-            if (Car.inputData.gear > 0) Car.inputData.gear--;
+            if (RaceManager.Instance.RaceRunning && Car.inputData.gear >= 0) Car.inputData.gear--;
         }
     }
 }

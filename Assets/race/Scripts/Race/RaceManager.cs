@@ -64,11 +64,11 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         racingCars.Add(await SpawnPlayerCar(car));
         racingCars[racingCars.Count - 1].name = "Player";
 
-        while (LapManager.Instance.HasGridPointAvailable)
+        //while (LapManager.Instance.HasGridPointAvailable)
         {
-            car = AssetContainer.Instance.carAssets[Random.Range(0, AssetContainer.Instance.carAssets.Length)];
-            racingCars.Add(await SpawnAICar(car));
-            racingCars[racingCars.Count - 1].name = "AI " + racingCars.Count;
+            //car = AssetContainer.Instance.carAssets[Random.Range(0, AssetContainer.Instance.carAssets.Length)];
+            //racingCars.Add(await SpawnAICar(car));
+            //racingCars[racingCars.Count - 1].name = "AI " + racingCars.Count;
         }
 
         await Task.Delay(5000);
@@ -77,6 +77,14 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         foreach (Car racingCar in racingCars)
         {
             LapManager.Instance.checkpointTracker.Add(racingCar, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
+
+            float gearRatio = racingCar.GetGearRatio();
+            if (gearRatio > 0.6f && gearRatio < 0.7f)
+            {
+                racingCar.inputData.rocketStart = racingCar.config.rocketStartLength;
+            }
+
+            racingCar.inputData.gear = 1;
         }
 
         RaceStarting = false;
@@ -92,6 +100,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carML, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
+        car.automaticTransmission = true;
         car.PlaceInStartingGrid();
 
         return car;
@@ -106,6 +115,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
+        car.automaticTransmission = true;
         car.PlaceInStartingGrid();
 
         return car;
@@ -134,6 +144,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carAI, car.transform);
 
         car.CarSetup(controller, car.model, car.config);
+        car.automaticTransmission = true;
     }
 
     private async Task SpawnTrack(TrackAsset asset)

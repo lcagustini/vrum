@@ -52,4 +52,7 @@ public class CarConfig : ScriptableObject
 
     public List<AnimationCurve> sidewaysGripFactorCurves;
     public List<AnimationCurve> speedGripFactorCurves;
+    public List<AnimationCurve> torqueGripCurves;
+
+    public float rocketStartLength;
 }

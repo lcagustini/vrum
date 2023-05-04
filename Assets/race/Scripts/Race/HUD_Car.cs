@@ -21,6 +21,8 @@ public class HUD_Car : ValidatedMonoBehaviour
     [SerializeField, Anywhere] private RectTransform raceEnded;
     [SerializeField, Anywhere] private RectTransform wrongWay;
 
+    [SerializeField, Anywhere] private Image drift;
+    [SerializeField, Anywhere] private Image rocket;
     [SerializeField, Anywhere] private Slider acceleration;
     [SerializeField, Anywhere] private Slider brake;
     [SerializeField, Anywhere] private Slider steer;
@@ -44,7 +46,7 @@ public class HUD_Car : ValidatedMonoBehaviour
         if (car == null) return;
 
         speed.text = (3.6f * car.RB.velocity.magnitude).ToString("F0") + " km/h";
-        gear.text = car.inputData.gear == 0 ? "R" : car.inputData.gear.ToString();
+        gear.text = car.inputData.gear == -1 ? "R" : (car.inputData.gear == 0 ? "N" : car.inputData.gear.ToString());
         gearRatio.value = car.GetGearRatio();
 
         if (gearRatio.value > 0.9f) gearRatioImage.color = Color.red;
@@ -54,6 +56,8 @@ public class HUD_Car : ValidatedMonoBehaviour
         bestTime.text = FormatTime(LapManager.Instance.GetBestTime(car));
         currentTime.text = FormatTime(LapManager.Instance.GetRunningTime(car));
 
+        drift.color = car.inputData.drift > 0 ? Color.yellow : Color.black;
+        rocket.color = car.inputData.rocketStart > 0 ? Color.yellow : Color.black;
         acceleration.value = car.inputData.accelerate;
         brake.value = car.inputData.brake;
         steer.value = (1 + car.inputData.steer) / 2;
