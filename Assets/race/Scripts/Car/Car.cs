@@ -31,13 +31,13 @@ public class Car : ValidatedMonoBehaviour
 
     [SerializeField, Child] public BoxCollider slipstreamCollider;
 
-    [ReadOnly] public ICarController controller;
-    [ReadOnly] public CarModel model;
-    [ReadOnly] public CarConfig config;
+    [ReadOnlyInspector] public ICarController controller;
+    [ReadOnlyInspector] public CarModel model;
+    [ReadOnlyInspector] public CarConfig config;
 
-    [ReadOnly] public StartingGridPoint gridPoint;
+    [ReadOnlyInspector] public StartingGridPoint gridPoint;
 
-    [ReadOnly] public InputData inputData;
+    [ReadOnlyInspector] public InputData inputData;
 
     public bool automaticTransmission;
 

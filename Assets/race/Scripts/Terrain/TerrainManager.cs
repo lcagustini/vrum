@@ -5,17 +5,47 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
+
+public struct SquareIndexes
+{
+    public bool valid1;
+    public int x1;
+    public int y1;
+    public int z1;
+
+    public bool valid2;
+    public int x2;
+    public int y2;
+    public int z2;
+}
 
 public class TerrainManager : ValidatedMonoBehaviour
 {
-    public struct TerrainJob : IJobParallelFor
-    {
-        [ReadOnly] public Vector3Int terrainOffset;
+    const int terrainSize = 80;
 
+    public struct VerticesJob : IJobParallelFor
+    {
         public NativeArray<Vector3> vertices;
         public NativeArray<Vector2> uvs;
-        public NativeArray<int> indexes;
+
+        public void Execute(int index)
+        {
+            int i = index / terrainSize;
+            int j = index % terrainSize;
+
+            vertices[index] = new Vector3(i, 0, j);
+            uvs[index] = new Vector2(i / (float)terrainSize, j / (float)terrainSize);
+        }
+    }
+
+    public struct IndexesJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<Vector3> vertices;
+        [ReadOnly] public NativeArray<Vector2> uvs;
+
+        public NativeArray<SquareIndexes> indexes;
 
         public static int IndexOf<T>(NativeArray<T> array, T value) where T : struct, System.IEquatable<T>
         {
@@ -28,28 +58,44 @@ public class TerrainManager : ValidatedMonoBehaviour
 
         public void Execute(int index)
         {
-            int i = index / 60;
-            int j = index % 60;
+            int i = index / terrainSize;
+            int j = index % terrainSize;
 
-            vertices[index] = new Vector3(i, 0, j);
-            uvs[index] = new Vector2(i / 60.0f, j / 60.0f);
+            SquareIndexes square = new();
 
             int index1 = IndexOf(vertices, new Vector3(i - 1, 0, j));
             int index2 = IndexOf(vertices, new Vector3(i - 1, 0, j + 1));
+            int index3 = IndexOf(vertices, new Vector3(i, 0, j));
             if (index1 != -1 && index2 != -1)
             {
-                indexes[3 * index] = index1;
-                indexes[3 * index + 1] = index2;
-                indexes[3 * index + 2] = index;
+                square.x1 = index1;
+                square.y1 = index2;
+                square.z1 = index3;
+                square.valid1 = true;
             }
 
             index2 = IndexOf(vertices, new Vector3(i, 0, j - 1));
             if (index1 != -1 && index2 != -1)
             {
-                indexes[3 * index] = index;
-                indexes[3 * index + 1] = index2;
-                indexes[3 * index + 2] = index1;
+                square.x2 = index3;
+                square.y2 = index2;
+                square.z2 = index1;
+                square.valid2 = true;
             }
+
+            indexes[index] = square;
+        }
+    }
+
+    public struct NoiseJob : IJobParallelFor
+    {
+        [ReadOnly] public float height;
+        [ReadOnly] public float scale;
+        public NativeArray<Vector3> vertices;
+
+        public void Execute(int index)
+        {
+            vertices[index] = new Vector3(vertices[index].x, height * Mathf.PerlinNoise(scale * vertices[index].x, scale * vertices[index].z), vertices[index].z);
         }
     }
 
@@ -58,15 +104,6 @@ public class TerrainManager : ValidatedMonoBehaviour
     [SerializeField] public float scale;
     [SerializeField] public float height;
 
-#if MAIN_THREAD
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<Vector2> uvs = new List<Vector2>();
-    private List<int> indexes = new List<int>();
-#endif
-
-    private Car car;
-    private Vector3Int terrainOffset;
-
     private void Start()
     {
         UpdateTerrain();
@@ -74,17 +111,18 @@ public class TerrainManager : ValidatedMonoBehaviour
 
     private void UpdateTerrain()
     {
+        double timer = Time.realtimeSinceStartupAsDouble;
 #if MAIN_THREAD
-        vertices.Clear();
-        indexes.Clear();
-        uvs.Clear();
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector2> uvs = new List<Vector2>();
+        List<int> indexes = new List<int>();
 
-        for (int i = terrainOffset.x - 20; i < 40 + terrainOffset.x; i++)
+        for (int i = 0; i < terrainSize; i++)
         {
-            for (int j = terrainOffset.z - 20; j < 40 + terrainOffset.z; j++)
+            for (int j = 0; j < terrainSize; j++)
             {
                 vertices.Add(new Vector3(i, 0, j));
-                uvs.Add(new Vector2(i / 60.0f, j / 60.0f));
+                uvs.Add(new Vector2(i / (float)terrainSize, j / (float)terrainSize));
 
                 int index1 = vertices.IndexOf(new Vector3(i - 1, 0, j));
                 int index2 = vertices.IndexOf(new Vector3(i - 1, 0, j + 1));
@@ -121,39 +159,70 @@ public class TerrainManager : ValidatedMonoBehaviour
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
 #else
-        NativeArray<Vector3> vertices = new NativeArray<Vector3>(60 * 60, Allocator.Persistent);
-        NativeArray<Vector2> uvs = new NativeArray<Vector2>(60 * 60, Allocator.Persistent);
-        NativeArray<int> indexes = new NativeArray<int>(3 * 2 * 59 * 59, Allocator.Persistent);
+        NativeArray<Vector3> vertices = new(terrainSize * terrainSize, Allocator.Persistent);
+        NativeArray<Vector2> uvs = new(terrainSize * terrainSize, Allocator.Persistent);
+        NativeArray<SquareIndexes> indexes = new(terrainSize * terrainSize, Allocator.Persistent);
 
-        TerrainJob job = new TerrainJob()
+        VerticesJob verticesJob = new()
         {
-            terrainOffset = terrainOffset,
             vertices = vertices,
             uvs = uvs,
-            indexes = indexes
         };
 
-        job.Schedule(60 * 60, 30).Complete();
+        verticesJob.Schedule(terrainSize * terrainSize, 32).Complete();
+
+        IndexesJob indexesJob = new()
+        {
+            vertices = vertices,
+            uvs = uvs,
+            indexes = indexes,
+        };
+
+        indexesJob.Schedule(terrainSize * terrainSize, 32).Complete();
+
+        NoiseJob noiseJob = new()
+        {
+            vertices = vertices,
+            height = height,
+            scale = scale,
+        };
+
+        noiseJob.Schedule(terrainSize * terrainSize, 32).Complete();
+
+        List<int> indexesInt = new();
+        foreach (SquareIndexes i in indexes)
+        {
+            if (i.valid1)
+            {
+                indexesInt.Add(i.x1);
+                indexesInt.Add(i.y1);
+                indexesInt.Add(i.z1);
+            }
+
+            if (i.valid2)
+            {
+                indexesInt.Add(i.x2);
+                indexesInt.Add(i.y2);
+                indexesInt.Add(i.z2);
+            }
+        }
+
+        Mesh mesh = new() { name = "Terrain" };
+
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(indexesInt, 0);
+        mesh.SetUVs(0, uvs);
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
 
         vertices.Dispose();
         uvs.Dispose();
         indexes.Dispose();
 #endif
-    }
-
-    private Vector3Int Vector3F2I(Vector3 v) => new Vector3Int(Mathf.RoundToInt(car.transform.position.x), Mathf.RoundToInt(car.transform.position.y), Mathf.RoundToInt(car.transform.position.z));
-
-    private void Update()
-    {
-        if (car == null && RaceManager.Instance.racingCars.Count > 0) car = RaceManager.Instance.racingCars[0];
-        if (car == null) return;
-
-        Vector3Int expectedTerrainOffset = Vector3F2I(car.transform.position);
-        expectedTerrainOffset.y = 0;
-        if (expectedTerrainOffset != terrainOffset)
-        {
-            terrainOffset = expectedTerrainOffset;
-            UpdateTerrain();
-        }
+        Debug.Log($"Time spent generating: {Time.realtimeSinceStartupAsDouble - timer}");
     }
 }
