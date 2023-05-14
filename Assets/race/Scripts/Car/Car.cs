@@ -142,8 +142,6 @@ public class Car : ValidatedMonoBehaviour
             inputData.rocketStart -= Time.deltaTime;
             if (inputData.rocketStart < 0) inputData.rocketStart = 0;
         }
-
-        Debug.Log(GetGearRatio());
     }
 
     private void FixedUpdate()
