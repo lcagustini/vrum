@@ -46,8 +46,8 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
     {
         RaceStarting = true;
 
-        //TrackAsset track = AssetContainer.Instance.trackAssets.FirstOrDefault(a => a.assetID == SceneLoader.Instance.playData.trackAssetID) ?? AssetContainer.Instance.trackAssets[0];
-        //await SpawnTrack(track);
+        TrackAsset track = AssetContainer.Instance.trackAssets.FirstOrDefault(a => a.assetID == SceneLoader.Instance.playData.trackAssetID) ?? AssetContainer.Instance.trackAssets[0];
+        await SpawnTrack(track);
 
         racingCars = new List<Car>();
         firstRacingCar = 0;
@@ -64,19 +64,19 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         racingCars.Add(await SpawnPlayerCar(car));
         racingCars[racingCars.Count - 1].name = "Player";
 
-        //while (LapManager.Instance.HasGridPointAvailable)
+        while (LapManager.Instance.HasGridPointAvailable)
         {
-            //car = AssetContainer.Instance.carAssets[Random.Range(0, AssetContainer.Instance.carAssets.Length)];
-            //racingCars.Add(await SpawnAICar(car));
-            //racingCars[racingCars.Count - 1].name = "AI " + racingCars.Count;
+            car = AssetContainer.Instance.carAssets[Random.Range(0, AssetContainer.Instance.carAssets.Length)];
+            racingCars.Add(await SpawnAICar(car));
+            racingCars[racingCars.Count - 1].name = "AI " + racingCars.Count;
         }
 
-        //await Task.Delay(5000);
+        await Task.Delay(5000);
 #endif
 
         foreach (Car racingCar in racingCars)
         {
-            //LapManager.Instance.checkpointTracker.Add(racingCar, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
+            LapManager.Instance.checkpointTracker.Add(racingCar, new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0));
 
             float gearRatio = racingCar.GetGearRatio();
             if (gearRatio > 0.6f && gearRatio < 0.7f)
@@ -130,7 +130,7 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         ICarController controller = AssetContainer.Instance.Instantiate<ICarController>(AssetContainer.Instance.carController, car.transform);
 
         car.CarSetup(controller, model, asset.carConfig);
-        //car.PlaceInStartingGrid();
+        car.PlaceInStartingGrid();
 
         return car;
     }

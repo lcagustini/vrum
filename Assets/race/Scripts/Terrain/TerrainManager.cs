@@ -3,6 +3,7 @@
 using KBCore.Refs;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -23,17 +24,18 @@ public struct SquareIndexes
 
 public class TerrainManager : ValidatedMonoBehaviour
 {
-    const int terrainSize = 80;
+    const int terrainSize = 300;
 
     public struct VerticesJob : IJobParallelFor
     {
+        [ReadOnly] public Vector2Int offset;
         public NativeArray<Vector3> vertices;
         public NativeArray<Vector2> uvs;
 
         public void Execute(int index)
         {
-            int i = index / terrainSize;
-            int j = index % terrainSize;
+            int i = index / terrainSize + offset.x;
+            int j = index % terrainSize + offset.y;
 
             vertices[index] = new Vector3(i, 0, j);
             uvs[index] = new Vector2(i / (float)terrainSize, j / (float)terrainSize);
@@ -42,6 +44,7 @@ public class TerrainManager : ValidatedMonoBehaviour
 
     public struct IndexesJob : IJobParallelFor
     {
+        [ReadOnly] public Vector2Int offset;
         [ReadOnly] public NativeArray<Vector3> vertices;
         [ReadOnly] public NativeArray<Vector2> uvs;
 
@@ -58,10 +61,10 @@ public class TerrainManager : ValidatedMonoBehaviour
 
         public void Execute(int index)
         {
-            int i = index / terrainSize;
-            int j = index % terrainSize;
+            int i = index / terrainSize + offset.x;
+            int j = index % terrainSize + offset.y;
 
-            SquareIndexes square = new();
+            SquareIndexes square = new ();
 
             int index1 = IndexOf(vertices, new Vector3(i - 1, 0, j));
             int index2 = IndexOf(vertices, new Vector3(i - 1, 0, j + 1));
@@ -104,12 +107,23 @@ public class TerrainManager : ValidatedMonoBehaviour
     [SerializeField] public float scale;
     [SerializeField] public float height;
 
-    private void Start()
+    private Car car;
+    private Car Car
     {
-        UpdateTerrain();
+        get
+        {
+            if (car == null) car = FindObjectOfType<Car>();
+            return car;
+        }
     }
 
-    private void UpdateTerrain()
+    private async void Start()
+    {
+        while (Car == null) await Task.Yield();
+        UpdateTerrain(car);
+    }
+
+    private void UpdateTerrain(Car car)
     {
         double timer = Time.realtimeSinceStartupAsDouble;
 #if MAIN_THREAD
@@ -159,20 +173,24 @@ public class TerrainManager : ValidatedMonoBehaviour
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
 #else
-        NativeArray<Vector3> vertices = new(terrainSize * terrainSize, Allocator.Persistent);
-        NativeArray<Vector2> uvs = new(terrainSize * terrainSize, Allocator.Persistent);
-        NativeArray<SquareIndexes> indexes = new(terrainSize * terrainSize, Allocator.Persistent);
+        NativeArray<Vector3> vertices = new (terrainSize* terrainSize, Allocator.Persistent);
+        NativeArray<Vector2> uvs = new (terrainSize* terrainSize, Allocator.Persistent);
+        NativeArray<SquareIndexes> indexes = new (terrainSize* terrainSize, Allocator.Persistent);
 
-        VerticesJob verticesJob = new()
+        Vector2Int offset = new Vector2Int((int)car.transform.position.x - terrainSize / 2, (int)car.transform.position.z - terrainSize / 2);
+
+        VerticesJob verticesJob = new ()
         {
+            offset = offset,
             vertices = vertices,
             uvs = uvs,
         };
 
         verticesJob.Schedule(terrainSize * terrainSize, 32).Complete();
 
-        IndexesJob indexesJob = new()
+        IndexesJob indexesJob = new ()
         {
+            offset = offset,
             vertices = vertices,
             uvs = uvs,
             indexes = indexes,
@@ -180,7 +198,7 @@ public class TerrainManager : ValidatedMonoBehaviour
 
         indexesJob.Schedule(terrainSize * terrainSize, 32).Complete();
 
-        NoiseJob noiseJob = new()
+        NoiseJob noiseJob = new ()
         {
             vertices = vertices,
             height = height,
@@ -189,7 +207,7 @@ public class TerrainManager : ValidatedMonoBehaviour
 
         noiseJob.Schedule(terrainSize * terrainSize, 32).Complete();
 
-        List<int> indexesInt = new();
+        List<int> indexesInt = new ();
         foreach (SquareIndexes i in indexes)
         {
             if (i.valid1)
@@ -207,7 +225,7 @@ public class TerrainManager : ValidatedMonoBehaviour
             }
         }
 
-        Mesh mesh = new() { name = "Terrain" };
+        Mesh mesh = new () { name = "Terrain" };
 
         mesh.SetVertices(vertices);
         mesh.SetTriangles(indexesInt, 0);
