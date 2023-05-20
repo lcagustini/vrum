@@ -82,7 +82,7 @@ public class Wheel : ValidatedMonoBehaviour
     {
         if (IsMotorWheel)
         {
-            float motorTorque = wheelData.motorTorqueFactor * car.config.motorMaxTorque;
+            float motorTorque = (car.inputData.rocketStart > 0 ? 1.5f : 1.0f) * wheelData.motorTorqueFactor * car.config.motorMaxTorque;
             Vector3 forceVector = wheelData.gripFactor * motorTorque * transform.forward;
 
             Debug.DrawLine(transform.position, transform.position + (forceVector / car.RB.mass), Color.magenta);
@@ -149,8 +149,7 @@ public class Wheel : ValidatedMonoBehaviour
 
         wheelData.motorTorqueFactor = car.config.steeringAccelerationFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * Mathf.Clamp(car.inputData.accelerate * car.config.motorTorqueResponseCurve[car.inputData.gear + 1].Evaluate(wheelData.topSpeedforwardRatio), -1.0f, 1.0f);
 
-        float torqueGripFactor = car.inputData.rocketStart > 0 ? 1 : car.config.torqueGripCurves[(int)wheelType].Evaluate(Mathf.Abs(wheelData.motorTorqueFactor));
-        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio) * torqueGripFactor;
+        wheelData.gripFactor = car.config.speedGripFactorCurves[(int)wheelType].Evaluate(wheelData.topSpeedRatio) * car.config.sidewaysGripFactorCurves[(int)wheelType].Evaluate(wheelData.sidewaysRatio);
         if (wheelData.speed < 0.001f) wheelData.gripFactor = Mathf.Clamp01(10 * wheelData.gripFactor);
 
         return wheelData;

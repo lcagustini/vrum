@@ -173,7 +173,7 @@ public class Car : ValidatedMonoBehaviour
 
         if (inputData.drift > 0)
         {
-            RB.rotation *= Quaternion.AngleAxis(inputData.steer * 120 * Mathf.Clamp01(directionDot) * Time.fixedDeltaTime, transform.up);
+            RB.rotation *= Quaternion.AngleAxis(inputData.steer * config.driftCarAngle * Mathf.Clamp01(directionDot) * Time.fixedDeltaTime, transform.up);
 
             float adjustScale = (2 * inputData.brake) + (inputData.accelerate);
             inputData.drift = Mathf.Lerp(inputData.drift, speed, 4 * adjustScale * Time.fixedDeltaTime);
