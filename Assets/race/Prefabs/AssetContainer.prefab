@@ -99,6 +99,17 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+  - assetID: TRACK2
+    trackModel:
+      m_AssetGUID: aa4bc8a938b5c47419c81b3e7088c2c3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    trackData:
+      m_AssetGUID: 40da00d20b614744aa5ec243dd26b0ba
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
 --- !u!114 &3741821853206460172
 MonoBehaviour:
   m_ObjectHideFlags: 0
