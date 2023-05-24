@@ -88,17 +88,6 @@ MonoBehaviour:
       m_EditorAssetChanged: 0
     carConfig: {fileID: 11400000, guid: 49baaac4492cf234981bddbbe06264e8, type: 2}
   trackAssets:
-  - assetID: TRACK1
-    trackModel:
-      m_AssetGUID: 3576b457d461ca04b8e740ee5fa015a5
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
-    trackData:
-      m_AssetGUID: 76baade1b1992f74cba370e9f7ef32bf
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
   - assetID: TRACK2
     trackModel:
       m_AssetGUID: aa4bc8a938b5c47419c81b3e7088c2c3
@@ -107,6 +96,17 @@ MonoBehaviour:
       m_EditorAssetChanged: 0
     trackData:
       m_AssetGUID: 40da00d20b614744aa5ec243dd26b0ba
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - assetID: TRACK1
+    trackModel:
+      m_AssetGUID: 3576b457d461ca04b8e740ee5fa015a5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    trackData:
+      m_AssetGUID: 76baade1b1992f74cba370e9f7ef32bf
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0

@@ -21,21 +21,24 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new();
+        List<Vector2> uvs = new();
         List<int> indexes = new();
+
+        float splineLength = racingLine.CalculateLength();
 
         for (float i = 0; i < 1; i += density)
         {
             if (racingLine.Evaluate(i, out float3 center, out float3 forward, out float3 up))
             {
-                forward = math.normalize(forward);
-                float3 right = Vector3.Cross(up, forward);
+                float3 right = Vector3.Cross(up, forward).normalized;
 
-                Debug.DrawLine(center, center + 20 * forward, Color.blue);
-                Debug.DrawLine(center, center + 20 * up, Color.green);
-                Debug.DrawLine(center, center + 20 * right, Color.red);
+                vertices.Add(center + 10 * right);
+                vertices.Add(center - 10 * right);
 
-                vertices.Add(center + 20 * right);
-                vertices.Add(center - 20 * right);
+                float scale = splineLength / (vertices[vertices.Count - 1] - vertices[vertices.Count - 2]).magnitude;
+
+                uvs.Add(new Vector2(1, scale * i));
+                uvs.Add(new Vector2(0, scale * i));
 
                 if (vertices.Count >= 4)
                 {
@@ -59,6 +62,7 @@ public class SplineToTrack : ValidatedMonoBehaviour
         indexes.Add(vertices.Count - 1);
 
         mesh.SetVertices(vertices);
+        mesh.SetUVs(0, uvs);
         mesh.SetIndices(indexes, MeshTopology.Triangles, 0);
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
