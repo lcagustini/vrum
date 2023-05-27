@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Splines;
 using UnityEngine.UIElements;
 
+[System.Serializable]
 public class TransformSnapshot
 {
     public Vector3 position;
@@ -45,9 +46,13 @@ public class TransformSnapshot
 
 public class SplineToTrack : ValidatedMonoBehaviour
 {
-    [SerializeField, Self] private SplineContainer racingLine;
-    [SerializeField, Self] private MeshFilter meshFilter;
-    [SerializeField, Self] private MeshCollider meshCollider;
+    [SerializeField, Self] public SplineContainer racingLine;
+
+    [SerializeField, Anywhere] public MeshFilter roadMesh;
+    [SerializeField, Anywhere] private MeshCollider roadCollider;
+
+    [SerializeField, Anywhere] private MeshFilter dirtMesh;
+    [SerializeField, Anywhere] private MeshCollider dirtCollider;
 
     [SerializeField] private float radius;
     [SerializeField] private float density;
@@ -59,11 +64,8 @@ public class SplineToTrack : ValidatedMonoBehaviour
     public List<TransformSnapshot> gridPoints = new List<TransformSnapshot>();
     public List<CheckpointCollider> checkpoints = new List<CheckpointCollider>();
 
-    private void GenerateTrackMesh()
+    private Mesh GenerateTrackMesh(float radius)
     {
-        Vector3 worldPos = transform.position;
-        transform.position = Vector3.zero;
-
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new();
         List<Vector2> uvs = new();
@@ -113,10 +115,7 @@ public class SplineToTrack : ValidatedMonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
 
-        meshCollider.sharedMesh = mesh;
-        meshFilter.mesh = mesh;
-
-        transform.position = worldPos;
+        return mesh;
     }
 
     private void CreateStartingGrid()
@@ -164,7 +163,16 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
     private void Awake()
     {
-        GenerateTrackMesh();
+        Mesh mesh;
+
+        mesh = GenerateTrackMesh(radius);
+        roadCollider.sharedMesh = mesh;
+        roadMesh.mesh = mesh;
+
+        mesh = GenerateTrackMesh(3 * radius);
+        dirtCollider.sharedMesh = mesh;
+        dirtMesh.mesh = mesh;
+        dirtCollider.transform.position = new Vector3(0, -0.001f, 0);
 
         CreateStartingGrid();
         CreateCheckpoints();

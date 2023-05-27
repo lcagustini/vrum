@@ -25,12 +25,10 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
         }
     }
 
+    [SerializeField] public int totalLaps;
+
     public Dictionary<Car, LapTracker> checkpointTracker = new Dictionary<Car, LapTracker>();
     private int availableGridPoint;
-
-    [SerializeField, Child] public SplineContainer racingLine;
-
-    [SerializeField] public int totalLaps;
 
     private SplineToTrack track;
     public SplineToTrack Track

@@ -30,7 +30,7 @@ public class CarMLController : Agent, ICarController
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        Vector3 followPoint = LapManager.Instance.racingLine.EvaluatePosition(followParameter);
+        Vector3 followPoint = LapManager.Instance.Track.racingLine.EvaluatePosition(followParameter);
         Vector3 followDir = followPoint - Car.transform.position;
         float sideToFollow = Mathf.Abs(Vector3.Dot(Car.transform.right, followDir.normalized));
         float cosToFollow = Vector3.Dot(Car.transform.right, followDir);
@@ -47,7 +47,7 @@ public class CarMLController : Agent, ICarController
         Car.inputData.brake = Mathf.Clamp01(actions.ContinuousActions[1]);
         Car.inputData.steer = Mathf.Clamp(actions.ContinuousActions[2], -1, 1);
 
-        Vector3 followPoint = LapManager.Instance.racingLine.EvaluatePosition(followParameter);
+        Vector3 followPoint = LapManager.Instance.Track.racingLine.EvaluatePosition(followParameter);
         Vector3 followDir = followPoint - Car.transform.position;
         float followDot = Vector3.Dot(followDir, Car.transform.forward);
 
@@ -83,7 +83,7 @@ public class CarMLController : Agent, ICarController
 
     private void Update()
     {
-        Vector3 followPoint = LapManager.Instance.racingLine.EvaluatePosition(followParameter);
+        Vector3 followPoint = LapManager.Instance.Track.racingLine.EvaluatePosition(followParameter);
         Vector3 followDir = followPoint - Car.transform.position;
         float followDot = Vector3.Dot(followDir, Car.transform.forward);
 

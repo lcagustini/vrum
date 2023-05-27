@@ -17,13 +17,13 @@ public class CarAIController : MonoBehaviour, ICarController
     {
         bool drifting = Car.inputData.drift > 0;
 
-        Vector3 followPoint = LapManager.Instance.racingLine.EvaluatePosition(followParameter);
+        Vector3 followPoint = LapManager.Instance.Track.racingLine.EvaluatePosition(followParameter);
         Vector3 followDir = followPoint - Car.transform.position;
         float sideToFollow = Vector3.Dot(Car.transform.right, followDir.normalized);
 
         float brakeParameter = followParameter + 0.02f;
         if (brakeParameter > 1) brakeParameter -= 1;
-        Vector3 brakePoint = LapManager.Instance.racingLine.EvaluatePosition(brakeParameter);
+        Vector3 brakePoint = LapManager.Instance.Track.racingLine.EvaluatePosition(brakeParameter);
         Vector3 brakeDir = brakePoint - Car.transform.position;
         float sideToBrake = Vector3.Dot(Car.transform.right, brakeDir.normalized);
 

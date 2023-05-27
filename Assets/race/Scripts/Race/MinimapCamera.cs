@@ -9,7 +9,7 @@ public class MinimapCamera : SingletonMonoBehaviourValidated<MinimapCamera>
 
     public void Setup()
     {
-        Mesh trackMesh = FindObjectOfType<SplineToTrack>().GetComponent<MeshFilter>().mesh;
+        Mesh trackMesh = LapManager.Instance.Track.roadMesh.mesh;
 
         float size = Mathf.Max(trackMesh.bounds.extents.x, trackMesh.bounds.extents.z);
 
