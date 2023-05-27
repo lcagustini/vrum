@@ -49,6 +49,8 @@ public class RaceManager : SingletonMonoBehaviour<RaceManager>
         TrackAsset track = AssetContainer.Instance.trackAssets.FirstOrDefault(a => a.assetID == SceneLoader.Instance.playData.trackAssetID) ?? AssetContainer.Instance.trackAssets[0];
         await SpawnTrack(track);
 
+        MinimapCamera.Instance.Setup();
+
         racingCars = new List<Car>();
         firstRacingCar = 0;
 

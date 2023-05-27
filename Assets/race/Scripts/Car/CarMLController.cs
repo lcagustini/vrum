@@ -21,8 +21,7 @@ public class CarMLController : Agent, ICarController
         Car.RB.angularVelocity = Vector3.zero;
         Car.RB.velocity = Vector3.zero;
 
-        Car.RB.position = Car.gridPoint.transform.position;
-        Car.RB.rotation = Car.gridPoint.transform.rotation;
+        Car.gridPoint.ApplySnapshotTo(Car.RB);
 
         LapManager.Instance.checkpointTracker[Car] = new LapManager.LapTracker(Time.timeSinceLevelLoad, 1, 0);
         checkpoint = 0;

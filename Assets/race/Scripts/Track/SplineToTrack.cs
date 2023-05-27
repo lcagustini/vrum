@@ -6,15 +6,60 @@ using UnityEngine;
 using UnityEngine.Splines;
 using UnityEngine.UIElements;
 
+public class TransformSnapshot
+{
+    public Vector3 position;
+    public Quaternion rotation;
+    public Vector3 scale;
+
+    public TransformSnapshot() { }
+
+    public TransformSnapshot(Transform transform)
+    {
+        position = transform.position;
+        rotation = transform.rotation;
+        scale = transform.localScale;
+    }
+
+    public TransformSnapshot(Rigidbody RB)
+    {
+        position = RB.position;
+        rotation = RB.rotation;
+        scale = RB.transform.localScale;
+    }
+
+    public void ApplySnapshotTo(Transform transform)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+        transform.localScale = scale;
+    }
+
+    public void ApplySnapshotTo(Rigidbody RB)
+    {
+        RB.position = position;
+        RB.rotation = rotation;
+        RB.transform.localScale = scale;
+    }
+}
+
 public class SplineToTrack : ValidatedMonoBehaviour
 {
     [SerializeField, Self] private SplineContainer racingLine;
     [SerializeField, Self] private MeshFilter meshFilter;
     [SerializeField, Self] private MeshCollider meshCollider;
 
+    [SerializeField] private float radius;
     [SerializeField] private float density;
+    [SerializeField] private int checkpointCount;
+    [SerializeField] private Vector2Int gridSize;
 
-    private void Start()
+    [SerializeField] private CheckpointCollider checkpointPrefab;
+
+    public List<TransformSnapshot> gridPoints = new List<TransformSnapshot>();
+    public List<CheckpointCollider> checkpoints = new List<CheckpointCollider>();
+
+    private void GenerateTrackMesh()
     {
         Vector3 worldPos = transform.position;
         transform.position = Vector3.zero;
@@ -32,8 +77,8 @@ public class SplineToTrack : ValidatedMonoBehaviour
             {
                 float3 right = Vector3.Cross(up, forward).normalized;
 
-                vertices.Add(center + 10 * right);
-                vertices.Add(center - 10 * right);
+                vertices.Add(center + radius * right);
+                vertices.Add(center - radius * right);
 
                 float scale = splineLength / (vertices[vertices.Count - 1] - vertices[vertices.Count - 2]).magnitude;
 
@@ -73,4 +118,66 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
         transform.position = worldPos;
     }
+
+    private void CreateStartingGrid()
+    {
+        for (int i = 1; i <= gridSize.y; i++)
+        {
+            if (racingLine.Evaluate(1 - (i / ((gridSize.y + 1) * (float)checkpointCount)), out float3 center, out float3 forward, out float3 up))
+            {
+                float3 right = Vector3.Cross(up, forward).normalized;
+
+                Vector3 rightPoint = center + radius * right;
+                Vector3 leftPoint = center - radius * right;
+
+                float thickness = 2 * radius;
+                float spacing = thickness / gridSize.x;
+
+                for (int j = 0; j < gridSize.x; j++)
+                {
+                    TransformSnapshot snapshot = new TransformSnapshot()
+                    {
+                        position = leftPoint + (j + 0.5f) * spacing * (Vector3)right,
+                        rotation = Quaternion.FromToRotation(Vector3.forward, forward),
+                        scale = Vector3.one
+                    };
+                    gridPoints.Add(snapshot);
+                }
+            }
+        }
+    }
+
+    private void CreateCheckpoints()
+    {
+        for (int i = 0; i < checkpointCount; i++)
+        {
+            if (racingLine.Evaluate(i / (float)checkpointCount, out float3 center, out float3 forward, out float3 up))
+            {
+                CheckpointCollider checkpoint = Instantiate(checkpointPrefab, transform);
+                checkpoint.transform.position = center + up * checkpoint.collider.size.y / 2;
+                checkpoint.transform.rotation = Quaternion.FromToRotation(Vector3.forward, forward);
+                checkpoint.order = i;
+                checkpoints.Add(checkpoint);
+            }
+        }
+    }
+
+    private void Awake()
+    {
+        GenerateTrackMesh();
+
+        CreateStartingGrid();
+        CreateCheckpoints();
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        foreach (TransformSnapshot p in gridPoints)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(p.position, 0.1f);
+        }
+    }
+#endif
 }

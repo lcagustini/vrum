@@ -25,28 +25,30 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
         }
     }
 
-    [SerializeField, Child] private CheckpointCollider[] checkpoints;
-    private int availableGridPoint;
-
-    [SerializeField, Child] private StartingGridPoint[] gridPoints;
     public Dictionary<Car, LapTracker> checkpointTracker = new Dictionary<Car, LapTracker>();
+    private int availableGridPoint;
 
     [SerializeField, Child] public SplineContainer racingLine;
 
     [SerializeField] public int totalLaps;
 
-    public bool HasGridPointAvailable => availableGridPoint < gridPoints.Length;
-
-    private void Start()
+    private SplineToTrack track;
+    public SplineToTrack Track
     {
-        CheckpointCollider checkpoint = checkpoints.First(c => c.order == 0);
+        get
+        {
+            if (track == null) track = FindObjectOfType<SplineToTrack>();
+            return track;
+        }
     }
 
-    public StartingGridPoint AllocateGridPoint()
-    {
-        if (availableGridPoint >= gridPoints.Length) return null;
+    public bool HasGridPointAvailable => availableGridPoint < Track.gridPoints.Count;
 
-        StartingGridPoint point = gridPoints[availableGridPoint];
+    public TransformSnapshot AllocateGridPoint()
+    {
+        if (availableGridPoint >= Track.gridPoints.Count) return null;
+
+        TransformSnapshot point = Track.gridPoints[availableGridPoint];
         availableGridPoint++;
         return point;
     }
@@ -60,7 +62,7 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
             checkpointTracker[car].checkpoint = order;
         }
 
-        if (order == 0 && checkpointTracker[car].checkpoint == checkpoints.Max(c => c.order))
+        if (order == 0 && checkpointTracker[car].checkpoint == Track.checkpoints.Max(c => c.order))
         {
             checkpointTracker[car].lapTimes.Add(Time.timeSinceLevelLoad - checkpointTracker[car].currentLapStartTime);
             checkpointTracker[car].checkpoint = 0;
@@ -90,14 +92,14 @@ public class LapManager : SingletonMonoBehaviourValidated<LapManager>
 
     public CheckpointCollider GetCheckpoint(Car car)
     {
-        return checkpoints.FirstOrDefault(c => c.order == checkpointTracker[car].checkpoint);
+        return Track.checkpoints.FirstOrDefault(c => c.order == checkpointTracker[car].checkpoint);
     }
 
     public CheckpointCollider GetNextCheckpoint(Car car)
     {
-        int maxOrder = checkpoints.Max(c => c.order);
+        int maxOrder = Track.checkpoints.Max(c => c.order);
         int nextOrder = checkpointTracker[car].checkpoint >= maxOrder ? checkpointTracker[car].checkpoint - maxOrder : checkpointTracker[car].checkpoint + 1;
-        return checkpoints.FirstOrDefault(c => c.order == nextOrder);
+        return Track.checkpoints.FirstOrDefault(c => c.order == nextOrder);
     }
 
     public float GetRunningTime(Car car)

@@ -35,7 +35,7 @@ public class Car : ValidatedMonoBehaviour
     [ReadOnlyInspector] public CarModel model;
     [ReadOnlyInspector] public CarConfig config;
 
-    [ReadOnlyInspector] public StartingGridPoint gridPoint;
+    [ReadOnlyInspector] public TransformSnapshot gridPoint;
 
     [ReadOnlyInspector] public InputData inputData;
 
@@ -80,8 +80,7 @@ public class Car : ValidatedMonoBehaviour
     public void PlaceInStartingGrid()
     {
         gridPoint = LapManager.Instance.AllocateGridPoint();
-        RB.position = gridPoint.transform.position;
-        RB.rotation = gridPoint.transform.rotation;
+        gridPoint.ApplySnapshotTo(RB);
     }
 
     public float GetGearRatio()
