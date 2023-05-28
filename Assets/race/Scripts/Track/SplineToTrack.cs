@@ -54,6 +54,9 @@ public class SplineToTrack : ValidatedMonoBehaviour
     [SerializeField, Anywhere] private MeshFilter dirtMesh;
     [SerializeField, Anywhere] private MeshCollider dirtCollider;
 
+    [SerializeField, Anywhere] private MeshFilter railingsMesh;
+    [SerializeField, Anywhere] private MeshCollider railingsCollider;
+
     [SerializeField] private float radius;
     [SerializeField] private float density;
     [SerializeField] private int checkpointCount;
@@ -63,6 +66,74 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
     public List<TransformSnapshot> gridPoints = new List<TransformSnapshot>();
     public List<CheckpointCollider> checkpoints = new List<CheckpointCollider>();
+
+    private Mesh GenerateRailingMesh(float radius, float height)
+    {
+        Mesh mesh = new Mesh();
+        List<Vector3> vertices = new();
+        List<Vector2> uvs = new();
+        List<int> indexes = new();
+
+        float splineLength = racingLine.CalculateLength();
+
+        for (float i = 0; i < 1; i += density)
+        {
+            if (racingLine.Evaluate(i, out float3 center, out float3 forward, out float3 up))
+            {
+                float3 right = Vector3.Cross(up, forward).normalized;
+
+                vertices.Add(center + radius * right);
+                vertices.Add(center + radius * right + height * up);
+
+                vertices.Add(center - radius * right);
+                vertices.Add(center - radius * right + height * up);
+
+                float scale = splineLength / (vertices[vertices.Count - 1] - vertices[vertices.Count - 2]).magnitude;
+
+                uvs.Add(new Vector2(1, scale * i));
+                uvs.Add(new Vector2(0, scale * i));
+
+                uvs.Add(new Vector2(1, scale * i));
+                uvs.Add(new Vector2(0, scale * i));
+
+                if (vertices.Count >= 8)
+                {
+                    indexes.Add(vertices.Count - 3);
+                    indexes.Add(vertices.Count - 7);
+                    indexes.Add(vertices.Count - 8);
+
+                    indexes.Add(vertices.Count - 8);
+                    indexes.Add(vertices.Count - 4);
+                    indexes.Add(vertices.Count - 3);
+
+                    indexes.Add(vertices.Count - 6);
+                    indexes.Add(vertices.Count - 5);
+                    indexes.Add(vertices.Count - 1);
+
+                    indexes.Add(vertices.Count - 1);
+                    indexes.Add(vertices.Count - 2);
+                    indexes.Add(vertices.Count - 6);
+                }
+            }
+        }
+
+        //indexes.Add(vertices.Count - 1);
+        //indexes.Add(1);
+        //indexes.Add(0);
+
+        //indexes.Add(0);
+        //indexes.Add(vertices.Count - 2);
+        //indexes.Add(vertices.Count - 1);
+
+        mesh.SetVertices(vertices);
+        mesh.SetUVs(0, uvs);
+        mesh.SetIndices(indexes, MeshTopology.Triangles, 0);
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+
+        return mesh;
+    }
 
     private Mesh GenerateTrackMesh(float radius)
     {
@@ -173,6 +244,10 @@ public class SplineToTrack : ValidatedMonoBehaviour
         dirtCollider.sharedMesh = mesh;
         dirtMesh.mesh = mesh;
         dirtCollider.transform.position = new Vector3(0, -0.001f, 0);
+
+        mesh = GenerateRailingMesh(3 * radius, 5f);
+        railingsCollider.sharedMesh = mesh;
+        railingsMesh.mesh = mesh;
 
         CreateStartingGrid();
         CreateCheckpoints();
