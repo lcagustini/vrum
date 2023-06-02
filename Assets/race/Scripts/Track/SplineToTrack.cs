@@ -76,7 +76,7 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
         float splineLength = racingLine.CalculateLength();
 
-        for (float i = 0; i < 1; i += density)
+        for (float i = 0; i < 1 - density; i += density)
         {
             if (racingLine.Evaluate(i, out float3 center, out float3 forward, out float3 up))
             {
@@ -93,8 +93,8 @@ public class SplineToTrack : ValidatedMonoBehaviour
                 uvs.Add(new Vector2(1, scale * i));
                 uvs.Add(new Vector2(0, scale * i));
 
-                uvs.Add(new Vector2(1, scale * i));
                 uvs.Add(new Vector2(0, scale * i));
+                uvs.Add(new Vector2(1, scale * i));
 
                 if (vertices.Count >= 8)
                 {
@@ -117,13 +117,21 @@ public class SplineToTrack : ValidatedMonoBehaviour
             }
         }
 
-        //indexes.Add(vertices.Count - 1);
-        //indexes.Add(1);
-        //indexes.Add(0);
+        indexes.Add(0);
+        indexes.Add(1);
+        indexes.Add(vertices.Count - 3);
 
-        //indexes.Add(0);
-        //indexes.Add(vertices.Count - 2);
-        //indexes.Add(vertices.Count - 1);
+        indexes.Add(0);
+        indexes.Add(vertices.Count - 3);
+        indexes.Add(vertices.Count - 4);
+
+        indexes.Add(vertices.Count - 1);
+        indexes.Add(3);
+        indexes.Add(2);
+
+        indexes.Add(vertices.Count - 2);
+        indexes.Add(vertices.Count - 1);
+        indexes.Add(2);
 
         mesh.SetVertices(vertices);
         mesh.SetUVs(0, uvs);
@@ -144,7 +152,7 @@ public class SplineToTrack : ValidatedMonoBehaviour
 
         float splineLength = racingLine.CalculateLength();
 
-        for (float i = 0; i < 1; i += density)
+        for (float i = 0; i < 1 - density; i += density)
         {
             if (racingLine.Evaluate(i, out float3 center, out float3 forward, out float3 up))
             {
@@ -232,11 +240,26 @@ public class SplineToTrack : ValidatedMonoBehaviour
         }
     }
 
+    private void MergeVerticesByDistance(Mesh mesh, float distance)
+    {
+        for (int i = 0; i < mesh.vertexCount; i++)
+        {
+            for (int j = i + 1; j < mesh.vertexCount; j++)
+            {
+                if ((mesh.vertices[i] - mesh.vertices[j]).sqrMagnitude > distance * distance)
+                {
+                    Debug.Log($"{i} {j}");
+                }
+            }
+        }
+    }
+
     private void Awake()
     {
         Mesh mesh;
 
         mesh = GenerateTrackMesh(radius);
+        MergeVerticesByDistance(mesh, density / 2);
         roadCollider.sharedMesh = mesh;
         roadMesh.mesh = mesh;
 

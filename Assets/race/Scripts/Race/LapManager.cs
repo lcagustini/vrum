@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public class LapManager : SingletonMonoBehaviourValidated<LapManager>
+public class LapManager : SingletonMonoBehaviour<LapManager>
 {
     public class LapTracker
     {

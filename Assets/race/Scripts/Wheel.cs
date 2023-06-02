@@ -188,7 +188,7 @@ public class Wheel : ValidatedMonoBehaviour
             if (groundType == GroundType.Dirt)
             {
                 wheelData.gripFactor *= 0.6f;
-                ApplyBrakeForce(0.1f, wheelData);
+                ApplyBrakeForce(0.2f, wheelData);
             }
 
             Grounded = true;
@@ -204,7 +204,7 @@ public class Wheel : ValidatedMonoBehaviour
                 ApplyDriftForce(wheelData);
             }
 
-            if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.005f, wheelData);
+            if (car.inputData.accelerate < MathHelper.epsilon) ApplyBrakeForce(0.05f, wheelData);
         }
         else
         {
